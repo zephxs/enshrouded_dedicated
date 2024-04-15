@@ -101,12 +101,13 @@ fi
 
 # if not try to find removed player
 if grep -q 'Remove Entity for Player' ${_WKGDIR}/log_news; then
-  _REMOVEDPLAYER=$(awk '/Remove Entity for Player/ {print $NF}' ${_WKGDIR}/log_news |tr -d "'")
-  _REMOVEDID=$(grep '\[session\] Player removed. Player handle:' ${_WKGDIR}/log_news | awk '{print $NF}') 
-  _LOGTHIS INFO "User Logout = $_REMOVEDPLAYER  #id:$_REMOVEDID"
+  _REMOVEDPLAYER=($(awk '/Remove Entity for Player/ {print $NF}' ${_WKGDIR}/log_news |tr -d "'"))
+  for _REMOVEDUSER in ${_REMOVEDPLAYER[@]}; do
+    _LOGTHIS INFO "User Logout = $_REMOVEDPLAYER"
+  grep -q "$_REMOVEDUSER" $_CONNECTED_USERS && sed -i "/$_REMOVEDUSER/d" $_CONNECTED_USERS
+  done
   [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "DR34DShrouded Server
-# User Logout = $_REMOVEDPLAYER"
-  grep -q "$_REMOVEDPLAYER" $_CONNECTED_USERS && sed -i "/$_REMOVEDPLAYER/d" $_CONNECTED_USERS
+# User Logout = ${_REMOVEDPLAYER[@]}"
 fi
 
 ### POST
