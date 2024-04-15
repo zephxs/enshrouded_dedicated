@@ -152,7 +152,7 @@ while read QUERYLINE; do
   _VALUE=$(awk -F': ' '{print $2}' <<<$QUERYLINE)
   [ -z "$_VALUE" ] && _VALUE="default"
   [ $_NAME = online ] && continue 
-  _MYECHO "$_NAME" |tr "_" " " && echo "$_VALUE"
+  _MYECHO "$_NAME |tr '_' ' '" && echo "$_VALUE"
   if [ $_NAME = players ]; then
     [ $_VALUE -gt 0 ] && _SHOWPLAYERS="true"
   fi
