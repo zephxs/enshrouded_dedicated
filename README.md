@@ -14,9 +14,9 @@ Client-Side:
 
 
 
-
-
-### "enshrd_query" and "steamquery.py" :
+<br />
+<br />
+### `enshrd_query` and `steamquery.py` :
 
 - [x] Show Server_Query infos (cf. https://developer.valvesoftware.com/wiki/Server_Queries)
 - [x] Show Currently connected Username(s)
@@ -27,7 +27,7 @@ Client-Side:
 
 
 
-### "enshrd_steamuser_check" :
+### `enshrd_steamuser_check` :
 
 - [x] Monitor enshroudedserver.log for [successfull/failed] connection attempts
 - [x] maintain a list of currently logged in Usernames
@@ -47,7 +47,7 @@ Client-Side:
 
 
 
-### "enshrd_backupgrade" :
+### `enshrd_backupgrade` :
 
 - [x] Auto backup Map files (server 'savegame' folder)
 - [x] Auto Update Game Server Files with SteamCMD if Steam Game Repository show a new update
