@@ -26,7 +26,7 @@ Client-Side:
 
 _screenshot:_
 
-<img src="https://github.com/dr34dl10n/enshrouded_dedicated/blob/main/assets/steamq.png" width="250">
+<img src="https://github.com/dr34dl10n/enshrouded_dedicated/blob/main/assets/steamq.png" width="512">
 <br />
 <br />
 
