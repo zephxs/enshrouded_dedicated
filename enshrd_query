@@ -90,8 +90,13 @@ if [ -z "$_NUMCHECK" ]; then
 _MYECHO -t "Enshrouded Server Query"
 # local / remote
 _MYECHO "Query type"; 
-[ "$_SERVERSIDE" = "true" ] && echo "[local]" || echo "[remote]"
+if [ "$_SERVERSIDE" = "true" ]; then
+  echo "[local]"
+  _GAMESRV="localhost"
+else 
+  echo "[remote]"
 fi
+
 
 ### FUNCTIONS
 if [ -z "$_NUMCHECK" ]; then
