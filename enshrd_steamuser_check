@@ -84,7 +84,7 @@ if grep '\[online\] Client' ${_WKGDIR}/log_news | grep -q 'authenticated by stea
     if grep -A15 ${_NEWHANDLER} ${_WKGDIR}/log_news | grep -q "Remove player from session. Not found in online game info." ; then
       _EXTERNAL_ID  
       _LOGTHIS WARN "Failed connection attempt = $_STEAMUSER"
-      [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "DR34DShrouded Server
+      [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "Enshrouded Server
 # FAILED User Auth = $_STEAMUSER"
 
     # else search username
@@ -92,7 +92,7 @@ if grep '\[online\] Client' ${_WKGDIR}/log_news | grep -q 'authenticated by stea
       _EXTERNAL_ID
       # log to file and send telegram alert
       _LOGTHIS INFO "User Connected = $_STEAMUSER $_NEWHANDLER"
-      [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "DR34DShrouded Server
+      [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "Enshrouded Server
 # User Connected = $_STEAMUSER"
       grep -q "$_STEAMUSER" $_CONNECTED_USERS || echo "$_STEAMUSER" >>$_CONNECTED_USERS 
     fi
@@ -106,7 +106,7 @@ if grep -q 'Remove Entity for Player' ${_WKGDIR}/log_news; then
     _LOGTHIS INFO "User Logout = $_REMOVEDPLAYER"
   grep -q "$_REMOVEDUSER" $_CONNECTED_USERS && sed -i "/$_REMOVEDUSER/d" $_CONNECTED_USERS
   done
-  [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "DR34DShrouded Server
+  [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "Enshrouded Server
 # User Logout = ${_REMOVEDPLAYER[@]}"
 fi
 
