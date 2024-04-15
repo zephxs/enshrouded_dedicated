@@ -1,8 +1,8 @@
 #!/bin/bash
-# Get Enshrouded Server infosi (via steamquery) and Currently connected User list + server version (via ssh)
+# Get Enshrouded Server infos (via steamquery) and Currently connected User list + server version (via ssh)
 # Require 'pip' for getting steamquery library and 'ssh' access to the server
 #
-
+### v1.0 - FINAL greatly reduced script exectime by doing only one ssh call
 ### v0.6 - added serverside run (used for updateand backup server only if no user are connected)
 ### v0.5 - added '-n' to only output the number of connected user : used for server update and restart
 ### v0.4 - added user check and display from server connected-users list
@@ -93,7 +93,8 @@ if [ -z "$_NUMCHECK" ]; then
   [ "$_SERVERSIDE" = "true" ] && echo "[local]" || echo "[remote]"
 fi
 # Auto set server to localhost if '-l'
-[ "$_SERVERSIDE" = "true" ] && _GAMESRV="localhost"
+[ "$_SERVERSIDE" = "true" ] && _GAMESRV="localhost" ||  _GETSSHINFO=$(ssh -t $_SSHALIAS "awk '/SVN/ {print \$NF}' ${_GAMEDIR}/logs/enshrouded_server.log; echo '#'; cat ${_WKGDIR}/connected-users |tr '\n' ' '" 2>/dev/null &)
+
 
 ### MAIN
 # Get connected user and server version
@@ -101,21 +102,20 @@ if [ -z "$_NUMCHECK" ]; then
   if [ "$_SERVERSIDE" = "true" ]; then
     _MYECHO "local files"
     if [ -f "${_WKGDIR}/connected-users" ] && [ -f "${_GAMEDIR}/logs/enshrouded_server.log" ]; then
-      _OK
       _GETACTIVEUSERS=$(cat ${_WKGDIR}/connected-users |tr "\n" " ")
       _CURRENTVERSION=$(awk '/SVN/ {print $NF}' ${_GAMEDIR}/logs/enshrouded_server.log)
+      _OK
     else
       _GETACTIVEUSERS="not found"
       _CURRENTVERSION="not found"
       _KO
     fi
   else
-    _MYECHO "ssh access"
-    ssh -t -o ConnectTimeout=2 "$_SSHALIAS" 'exit' 2>/dev/null
-    if [ "$?" -eq 0 ]; then
+    _MYECHO "ssh infos"
+    if [ ! -z "$_GETSSHINFO" ]; then
+      _GETACTIVEUSERS=$(echo $_GETSSHINFO| tr "\n" " " |awk -F'#' '{print $NF}')
+      _CURRENTVERSION=$(echo $_GETSSHINFO| tr "\n" " " |awk -F'#' '{print $1}')
       _OK
-      _GETACTIVEUSERS=$(ssh -t $_SSHALIAS "cat ${_WKGDIR}/connected-users |tr '\n' ' '" 2>/dev/null &)
-      _CURRENTVERSION=$(ssh -t $_SSHALIAS "awk '/SVN/ {print \$NF}' ${_GAMEDIR}/logs/enshrouded_server.log" 2>/dev/null &)
     else
       _GETACTIVEUSERS="not found"
       _CURRENTVERSION="not found"
