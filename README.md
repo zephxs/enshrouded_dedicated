@@ -1,16 +1,20 @@
 # enshrouded_dedicated toolset
 
-Simple Shell script-set to "Monitor / Backup / Update" Enshrouded dedicated servers :
+Simple Shell script-set to "Monitor / Backup / Update" Enshrouded dedicated servers.
 
 
-# "enshrd_query" :
+Server-Side: All the scripts work together to collect realtime informations (every minutes), and once a day backup the server map and upgrade server core files if needed (with SteamCMD). They all need to be placed in the PATH of the "enshrouded user" that runs the server binary (enshrouded_server.exe).
+
+
+Client-Side: 'enshrd_query' + 'steamquery.py' scripts can be used from any linux manchine to get the server status, infos, and Username(s) that are currently logged in to the server.
+
+
+# "enshrd_query" and "steamquery.py" :
 
 - Show Server_Query infos (cf. https://developer.valvesoftware.com/wiki/Server_Queries)
-- Show Currently connected User(s)
+- Show Currently connected Username(s)
 
-requires: python3 'pip' for SteamQuery lib install,
-
-ssh access to the server (agent running), and the script 'steamquery.py' from this repository in the PATH
+requires: python3 'pip' for SteamQuery lib install and use, 'ssh access' to the server (preferably with a running agent), 
 
 
 # "enshrd_steamuser_check" :
