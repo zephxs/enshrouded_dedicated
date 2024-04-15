@@ -1,0 +1,101 @@
+#!/bin/bash
+### Get Server_Query infos and Currently connected User list
+# v0.4 - added 'user-only' check, and show connected-users list (require ssh-agent running for no pass)
+# v0.3 - added auto install prerequisites (only pip is needed in first place) and failed query / Online status
+# v0.2 - added args to bash and py, usage, and vars
+# v0.1 - POC
+
+# VARS (_GAMESRV and _QUERYPORT used to run the query script without arguments
+_GAMESRV="your.dedicated.server"
+_QUERYPORT="15637"
+_TMPQUERYFILE="/tmp/.steamquery.log"
+
+# PREREQ
+# install SteamQuery python lib via pip (mantadory)
+type pip >/dev/null || { echo -e "Python 'pip' not found, and is required for SteamQuery library install\n  exiting.."; exit 1; }
+if ! pip show SteamQuery >/dev/null 2>&1; then pip install SteamQuery; fi
+# Load myecho function for nicer output
+if ! type _MYECHO >/dev/null 2>&1; then
+  if [ -f "/etc/profile.d/01-myecho-colors.sh" ]; then
+    source /etc/profile.d/01-myecho-colors.sh >/dev/null 2>&1
+  elif [ -f "$HOME/01-myecho-colors.sh" ]; then
+    source "$HOME/01-myecho-colors.sh" >/dev/null 2>&1
+  else
+    echo "Nice Output - Install 'myecho' function (in homedir: 01-myecho-colors.sh)"
+    cd "$HOME"
+    curl -s -LO https://raw.githubusercontent.com/zephxs/bash/master/functions/01-myecho-colors.sh
+    head -20 01-myecho-colors.sh |grep -q "^_MYECHO () {" && echo "myecho installed!" || { echo "myecho install failed, exit.."; exit 1; }
+    source "$HOME/01-myecho-colors.sh" >/dev/null 2>&1
+  fi
+fi
+
+# Usage
+_SCRIPTUSAGE(){
+_MYECHO -c green -p "Usage:"
+_MYECHO "$(basename $0) <server>:<port>"
+_MYECHO -p "Query All Steam Server Infos"
+_MYECHO "$(basename $0) -s <server> -p <port>"
+_MYECHO -p "Same with defined aguments"
+_MYECHO "$(basename $0) <server>:<port> -u"
+_MYECHO -p "Query only currently connected users"
+}
+
+# Title and Args parse
+_MYECHO -t "SteamQuery"
+while (( "$#" )); do
+  case "$1" in
+  -h|--help) _SCRIPTUSAGE; exit 0;;
+  -u|--users) _USERCHECK="true"; shift 1;;
+  -s|--server) _GAMESRV="${1}"; shift 1;;
+  -p|--port) _QUERYPORT="${1}"; shift 1;;
+  -*|--*) _MYECHO -c red -p "Flag not recognised.." >&2; _SCRIPTUSAGE; exit 1 ;;
+  *) if grep -q ':' <<<$1; then
+       _GAMESRV=$(awk -F':' '{print $1}' <<<$1)
+       _QUERYPORT=$(awk -F':' '{print $NF}' <<<$1)
+     else _MYECHO -c red -p "Argument not 'game_server:port', exit.." && exit 1
+     fi
+     shift 1
+    ;;
+  esac
+done
+
+### FUNCTIONS
+# launch ssh query in background to get usernames for quick use if needed
+_GETACTIVEUSERS=$(ssh -t $_GAMESRV 'cat enshrd-monitor/connected-user |tr "\n" " "' 2>/dev/null &)
+
+### MAIN
+# test gameserver and port variables
+[ -z "$_GAMESRV" -a -z "$_QUERYPORT" ] && _MYECHO -c red -p "Missing Server:Port args.. exit" && exit 1
+
+# Get server status with python SteamQuery libs
+_MYECHO "Online Status"
+steamquery.py $_GAMESRV $_QUERYPORT |tr -d "{|}|'" |tr "," "\n" >${_TMPQUERYFILE}
+grep -q "^error:" ${_TMPQUERYFILE} && { _KO; exit 1; } || _OK
+
+# Users only check
+if [ "$_USERCHECK" = "true" ]; then
+_SRVNAME=$(cat ${_TMPQUERYFILE} |awk -F': ' '/name/ {print $NF}')
+_USERS=$(grep "^ players" ${_TMPQUERYFILE} |awk -F': ' '{print $NF}')
+_MYECHO "Server Name" && echo "$_SRVNAME"
+_MYECHO "Connected Users" && echo "$_USERS"
+if [ "$_USERS" -gt 0 ]; then 
+  _MYECHO "Usernames"
+  echo "$_GETACTIVEUSERS"
+  echo
+fi
+exit 0
+fi
+
+# Parse all Server Infos
+while read QUERYLINE; do
+_NAME=$(awk -F': |:' '{print $1}' <<<$QUERYLINE)
+_VALUE=$(awk -F': ' '{print $2}' <<<$QUERYLINE)
+[ -z "$_VALUE" ] && _VALUE="default"
+[ $_NAME = online ] && continue 
+_MYECHO "$_NAME" && echo "$_VALUE"
+if [ $_NAME = players ]; then
+[ $_VALUE -gt 0 ] && _SHOWPLAYERS="true"
+fi
+done <${_TMPQUERYFILE}
+[ "$_SHOWPLAYERS" = true ] && { _MYECHO "Usernames"; echo "$_GETACTIVEUSERS"; echo; }
+
