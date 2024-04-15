@@ -24,7 +24,7 @@ Client-Side:
 
 <br />
 
-enshrd_query screenshot:
+screenshot:
 
 ![script run](/assets/steamq.png)
 
@@ -45,7 +45,8 @@ enshrd_query screenshot:
 > https://raw.githubusercontent.com/zephxs/ncat-ipset-honeypot/master/telegram-send
 
 <br />
-Sample logs:
+
+> Sample logs:
 ```
 $cat ~/enshrd-monitor/user-connection.log
 [2024-04-15 10:31:30] [INFO] New ID(s) detected = 0(1)
@@ -68,7 +69,8 @@ $cat ~/enshrd-monitor/user-connection.log
 > 30 4 * * * /usr/local/sbin/enshrd_backupgrade
 
 <br />
-Sample logs:
+
+> Sample logs:
 ```
 [2024-04-15 04:05:32] [START] Enshrouded server Backup / Update started
 [2024-04-15 04:05:32] [INFO] Current version: 511168
