@@ -13,6 +13,7 @@ Client-Side:
 
 <br />
 <br />
+
 ### enshrd_query + steamquery.py
 
 - [x] Show Server_Query infos (cf. https://developer.valvesoftware.com/wiki/Server_Queries)
@@ -22,33 +23,14 @@ Client-Side:
 > requires: python3 `pip` for SteamQuery lib install and use, `ssh access` to the server (preferably with a running agent), 
 
 
-<p style="color:#0000FF">######################### Enshrouded Server Query ##########################</p>
-# query type                               = [remote]
-# ssh infos                                = [OK]
-# online state                             = [OK]
-# ip                                       = dedicated.server.net
-# port                                     = 15637
-# name                                     = My Enshrouded World
-# map                                      = default
-# game                                     = Enshrouded
-# description                              = Enshrouded
-# players                                  = 3
-# max players                              = 8
-# bots                                     = 0
-# password required                        = True
-# vac secure                               = False
-# server type                              = Dedicated
-# os                                       = Windows
-# server version                           = 511168
-# username(s)                              = user1 user2 user3
+<br />
+<br />
 
-<br />
-<br />
 ### enshrd_steamuser_check
 
 - [x] Monitor enshroudedserver.log for [successfull/failed] connection attempts
 - [x] maintain a list of currently logged in Usernames
-- [x] [Optional] send custom message to telegram channel on User Login/Logout
+- [x] \(Optional) send custom message to telegram channel on User Login/Logout
 
 > [!TIP]
 > Crontab every minute :
@@ -63,6 +45,7 @@ Client-Side:
 
 <br />
 <br />
+
 ### enshrd_backupgrade
 
 - [x] Auto backup Map files (server 'savegame' folder)
