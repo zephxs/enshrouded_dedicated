@@ -105,8 +105,9 @@ if [ -z "$_NUMCHECK" ]; then
       _GETACTIVEUSERS=$(cat ${_WKGDIR}/connected-users |tr "\n" " ")
       _CURRENTVERSION=$(awk '/SVN/ {print $NF}' ${_GAMEDIR}/logs/enshrouded_server.log)
     else
-      _FAILCHECK="true"
-      _KO ":files not found.. Will NOT display Usernames and Server Version"
+      _GETACTIVEUSERS="not found"
+      _CURRENTVERSION="not found"
+      _KO
     fi
   else
     _MYECHO "ssh access"
@@ -116,8 +117,9 @@ if [ -z "$_NUMCHECK" ]; then
       _GETACTIVEUSERS=$(ssh -t $_SSHALIAS "cat ${_WKGDIR}/connected-users |tr '\n' ' '" 2>/dev/null &)
       _CURRENTVERSION=$(ssh -t $_SSHALIAS "awk '/SVN/ {print \$NF}' ${_GAMEDIR}/logs/enshrouded_server.log" 2>/dev/null &)
     else
-      _FAILCHECK="true"
-      _KO ":SSH Alias not working.. Will NOT display Usernames and Server Version"
+      _GETACTIVEUSERS="not found"
+      _CURRENTVERSION="not found"
+      _KO
     fi
   fi
 fi
@@ -138,7 +140,7 @@ _USERS=$(grep "^ players" ${_TMPQUERYFILE} |awk -F': ' '{print $NF}')
 _MYECHO "server name" && echo "$_SRVNAME"
 _MYECHO "server version" && echo "$_CURRENTVERSION"
 _MYECHO "connected users" && echo "$_USERS"
-if [ "$_USERS" -gt 0 ] && [ -z "$_FAILCHECK" ]; then
+if [ "$_USERS" -gt 0 ]; then
   _MYECHO "username(s)"
   echo "$_GETACTIVEUSERS"
   echo
@@ -152,12 +154,12 @@ while read QUERYLINE; do
   _VALUE=$(awk -F': ' '{print $2}' <<<$QUERYLINE)
   [ -z "$_VALUE" ] && _VALUE="default"
   [ $_NAME = online ] && continue 
-  _MYECHO "$_NAME |tr '_' ' '" && echo "$_VALUE"
+  _MYECHO "$_NAME" |tr '_' ' ' && echo "$_VALUE"
   if [ $_NAME = players ]; then
     [ $_VALUE -gt 0 ] && _SHOWPLAYERS="true"
   fi
 done <${_TMPQUERYFILE}
 _MYECHO "server version" && echo "$_CURRENTVERSION"
-[ "$_SHOWPLAYERS" = true -a -z "$_FAILCHECK" ] && { _MYECHO "username(s)"; echo "$_GETACTIVEUSERS"; }
+[ "$_SHOWPLAYERS" = true ] && { _MYECHO "username(s)"; echo "$_GETACTIVEUSERS"; }
 echo
 
