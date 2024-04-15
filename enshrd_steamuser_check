@@ -1,47 +1,69 @@
 #!/bin/bash
-##### Grab newest Connection logs since last check, get User STEAM ID, convert to User Name, and send telegram alert
-### v0.4 - Added currently connected user list
-### v0.3 - Added logged in and failed auth detection
-### v0.2 - Added method to get online username thanks to 'https://steamid.io'
+# Grab newest Connection logs since last check
+# get User STEAM ID, convert to User Name
+# and send telegram alert
+#
+### v0.4 - Added connected user list to get the info outside the script
+### v0.3 - Added logged in and auth failed 
+### v0.2 - Added method to get online username
 ### v0.1 - POC
 #
-# Crontab every minute : 
+## Crontab every minute :
 # */1 * * * * /usr/local/sbin/enshrd_steamuser_check
 #
 # telegram-alert sample script can be found here :
 # https://raw.githubusercontent.com/zephxs/ncat-ipset-honeypot/master/telegram-send
 
 ### VARS
-_ENSHRD_LOGFILE="/home/enshrouded/enshroudedserver/logs/enshrouded_server.log"
-_WKGDIR="/home/enshrouded/enshrd-monitor"
-_CONNECTED_USERS="${_WKGDIR}/connected-users"
-_LOCKFILE="/tmp/enshrd.lock"
-# Disable Telegram-alert 
-_TELEGRAM_ALERT="false"
+_GAMEDIR="/home/enshrouded/enshroudedserver"                    # Enshrrouded game directory
+_ENSHRD_LOGFILE="${_GAMEDIR}/logs/enshrouded_server.log"        # Enshrouded server log file
+_WKGDIR="/home/enshrouded/enshrd-monitor"                       # Monitoring folder used by script set
+_CONNECTED_USERS="${_WKGDIR}/connected-users"                   # List of Currently Connected Users
+_LOCKFILE="/tmp/enshrd_chk.lock"
+# Disable Telegram-alert
+_TELEGRAM_ALERT="false"                                         # 'telegram-send' script must be in PATH
+
 
 ### PRE
+_LOGTHIS(){
+_LOG_FILE="${_WKGDIR}/user-connection.log"
+local _LEVEL="$1"
+local _MESSAGE="$2"
+local _TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+printf "[${_TIMESTAMP}] [${_LEVEL}] ${_MESSAGE}\n" >>$_LOG_FILE
+}
+
 [ -d "$_WKGDIR" ] || mkdir -p ${_WKGDIR}
+[ -f "$_ENSHRD_LOGFILE" ] || { _LOGTHIS FAIL "Enshrouded Server Logfile not found.."; exit 1; }
+[ -f "${_WKGDIR}/last_check" ] || touch "${_WKGDIR}/last_check"
+
 # Block script if already in run
 if [ -e "$_LOCKFILE" ]; then
 _PID=$(cat ${_LOCKFILE})
 ps -p $_PID -o pid= >/dev/null 2>&1
   if [ $? -eq 0 ]; then
-    echo "Process is running"
+    _LOGTHIS FAIL "Process is already running.."
     exit
   fi
 fi
 echo $$ >$_LOCKFILE
 trap 'rm -f "$_LOCKFILE"' EXIT
 
-### FUNCTIONS
+_EXITR(){
+# copy current log for next compare and remove found connection events
+cp -f "$_ENSHRD_LOGFILE" ${_WKGDIR}/last_check
+>${_WKGDIR}/log_news 
+rm -f "${_LOCKFILE}"
+}
+
 # Get new lines from current log file
 _GET_LOGDIFF(){
 diff ${_WKGDIR}/last_check $_ENSHRD_LOGFILE | grep "^>" >${_WKGDIR}/log_news
 }
 
 _EXTERNAL_ID(){
-# Identify User who tries to login with online service https://steamid.io
-_STEAMSRC=$(grep -B4 ${_STEAMID} ${_WKGDIR}/log_news  | awk -F"'" '/ authenticated by steam/ {print $(NF-1)}')
+# Identify User who tries to login with online service
+_STEAMSRC=$(grep -B4 ${_NEWHANDLER} ${_WKGDIR}/log_news  | awk -F"'" '/ authenticated by steam/ {print $(NF-1)}')
 _STEAMUSER=$(curl -f -s https://steamid.io/lookup/$_STEAMSRC | grep -A1 ' <dt class="key">name</dt>' | awk -F'>|<' '/value/ {print $(NF-2)}')
 [ -z "$_STEAMUSER" ] && _STEAMUSER="NotFound"
 }
@@ -50,18 +72,18 @@ _STEAMUSER=$(curl -f -s https://steamid.io/lookup/$_STEAMSRC | grep -A1 ' <dt cl
 _GET_LOGDIFF
 # exit if no new logs found
 [ -s "${_WKGDIR}/log_news" ] || exit 0
-# If New Client login detected, parse new logs
+# If New Client login detected parse new logs
 if grep '\[online\] Client' ${_WKGDIR}/log_news | grep -q 'authenticated by steam'; then
-  # Get New Player Handler
+  # Get New Player Handler or exit
   _NEWUSERIDS=($(awk '/Remote player added. Player handle/ {print $NF}' ${_WKGDIR}/log_news))
-  [ -z "${_NEWUSERIDS[*]}" ] && exit 0 || echo -e "[$(date '+%d/%m/%Y %H:%M')] New ID(s) detected = ${_NEWUSERIDS[@]}" >> ${_WKGDIR}/user-connection.log
-  # sleep 5 sec for if the connection just occurs
+  [ -z "${_NEWUSERIDS[*]}" ] && _EXITR || _LOGTHIS INFO "New ID(s) detected = ${_NEWUSERIDS[@]}"
+  # sleep 5 sec if the connection just occurs
   sleep 5 && _GET_LOGDIFF
-  for _STEAMID in "${_NEWUSERIDS[@]}"; do
+  for _NEWHANDLER in "${_NEWUSERIDS[@]}"; do
     # If Auth fail
-    if grep -A15 ${_STEAMID} ${_WKGDIR}/log_news | grep -q "Remove player from session. Not found in online game info." ; then
+    if grep -A15 ${_NEWHANDLER} ${_WKGDIR}/log_news | grep -q "Remove player from session. Not found in online game info." ; then
       _EXTERNAL_ID  
-      echo "[$(date '+%d/%m/%Y %H:%M')] Failed connection attempt = $_STEAMUSER" >> ${_WKGDIR}/user-connection.log 
+      _LOGTHIS WARN "Failed connection attempt = $_STEAMUSER"
       [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "DR34DShrouded Server
 # FAILED User Auth = $_STEAMUSER"
 
@@ -77,7 +99,7 @@ if grep '\[online\] Client' ${_WKGDIR}/log_news | grep -q 'authenticated by stea
         [ -z "$_STEAMUSER" ] && { sleep 3; continue; } || break
       done
       # log to file and send telegram alert
-      echo "[$(date '+%d/%m/%Y %H:%M')] User Connected = $_STEAMUSER" >> ${_WKGDIR}/user-connection.log
+      _LOGTHIS INFO "User Connected = $_STEAMUSER"
       [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "DR34DShrouded Server
 # User Connected = $_STEAMUSER"
       grep -q "$_STEAMUSER" $_CONNECTED_USERS || echo "$_STEAMUSER" >>$_CONNECTED_USERS 
@@ -89,15 +111,12 @@ fi
 if grep -q 'Remove Entity for Player' ${_WKGDIR}/log_news; then
   _REMOVEDPLAYER=$(awk '/Remove Entity for Player/ {print $NF}' ${_WKGDIR}/log_news |tr -d "'")
   _REMOVEDID=$(grep '\[session\] Player removed. Player handle:' ${_WKGDIR}/log_news | awk '{print $NF}') 
-  echo "[$(date '+%d/%m/%Y %H:%M')] User Logout = $_REMOVEDPLAYER  #id:$_REMOVEDID" >> ${_WKGDIR}/user-connection.log
+  _LOGTHIS INFO "User Logout = $_REMOVEDPLAYER  #id:$_REMOVEDID"
   [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "DR34DShrouded Server
 # User Logout = $_REMOVEDPLAYER"
   grep -q "$_REMOVEDPLAYER" $_CONNECTED_USERS && sed -i "/$_REMOVEDPLAYER/d" $_CONNECTED_USERS
 fi
 
 ### POST
-# copy current log for next compare and remove found connection events
-cp -f "$_ENSHRD_LOGFILE" ${_WKGDIR}/last_check
->${_WKGDIR}/log_news 
-rm -f "${_LOCKFILE}"
+_EXITR
 

@@ -12,20 +12,20 @@
 
 ### VARS (Important: has to match your install)
 # Server infos:
-_GAMESRV="dedicated_enshrouded-server.net"    # put "localhost" for serverside queries
-_QUERYPORT="15637"    # Query port defined on your server
-
-_SSHALIAS="$_GAMESRV"    # SSH server alias (set if different from server name)
+_GAMESRV="dedicated_enshrouded-server.net"    # Server hostname or IP address
+_QUERYPORT="15637"                            # Query port defined on your server
+_SSHALIAS="$_GAMESRV"                         # SSH server alias (set if different from server name)
 
 # tmp file location
 _TMPQUERYFILE="/tmp/.steamquery.log"
 
 # Enshrouded Server location info
-_GAMEUSERDIR="/home/enshrouded"    # Enshrouded server User homedir
-_GAMEDIR="${_GAMEUSERDIR}/enshroudedserver"    # Enshrouded Server directory
+_GAMEUSERDIR="/home/enshrouded"               # Enshrouded server User homedir
+_GAMEDIR="${_GAMEUSERDIR}/enshroudedserver"   # Enshrouded Server directory
+_WKGDIR="${_GAMEUSERDIR}/enshrd-monitor"      # Enshrouded Server directory
 
 # Set _SERVERSIDE to "true" to run script on the server directly (or use '-l')
-_SERVERSIDE=""
+_SERVERSIDE=""                                # Set to true to avoid using '-l' locally (used for scripting purpose)
 
 
 # PREREQ
@@ -86,36 +86,37 @@ while (( "$#" )); do
   esac
 done
 
+# Auto set server to localhost if '-l'
 if [ -z "$_NUMCHECK" ]; then
 _MYECHO -t "Enshrouded Server Query"
 # local / remote
-_MYECHO "Query type"; 
+_MYECHO "query type" 
 if [ "$_SERVERSIDE" = "true" ]; then
   echo "[local]"
   _GAMESRV="localhost"
-else 
+else
   echo "[remote]"
 fi
 
-
-### FUNCTIONS
+### MAIN
+# Get connected user and server version
 if [ -z "$_NUMCHECK" ]; then
   if [ "$_SERVERSIDE" = "true" ]; then
-    _MYECHO "Local files"
-    if [ -f "${_GAMEUSERDIR}/enshrd-monitor/connected-users" ] && [ -f "${_GAMEDIR}/logs/enshrouded_server.log" ]; then
+    _MYECHO "local files"
+    if [ -f "${_WKGDIR}/connected-users" ] && [ -f "${_GAMEDIR}/logs/enshrouded_server.log" ]; then
       _OK
-      _GETACTIVEUSERS=$(cat ${_GAMEUSERDIR}/enshrd-monitor/connected-users |tr "\n" " ")
+      _GETACTIVEUSERS=$(cat ${_WKGDIR}/connected-users |tr "\n" " ")
       _CURRENTVERSION=$(awk '/SVN/ {print $NF}' ${_GAMEDIR}/logs/enshrouded_server.log)
     else
       _FAILCHECK="true"
       _KO ":files not found.. Will NOT display Usernames and Server Version"
     fi
   else
-    _MYECHO "Ssh access"
+    _MYECHO "ssh access"
     ssh -t -o ConnectTimeout=2 "$_SSHALIAS" 'exit' 2>/dev/null
     if [ "$?" -eq 0 ]; then
       _OK
-      _GETACTIVEUSERS=$(ssh -t $_SSHALIAS "cat ${_GAMEUSERDIR}/connected-users |tr '\n' ' '" 2>/dev/null &)
+      _GETACTIVEUSERS=$(ssh -t $_SSHALIAS "cat ${_WKGDIR}/connected-users |tr '\n' ' '" 2>/dev/null &)
       _CURRENTVERSION=$(ssh -t $_SSHALIAS "awk '/SVN/ {print \$NF}' ${_GAMEDIR}/logs/enshrouded_server.log" 2>/dev/null &)
     else
       _FAILCHECK="true"
@@ -124,13 +125,11 @@ if [ -z "$_NUMCHECK" ]; then
   fi
 fi
 
-
-### MAIN
 # test gameserver and port variables
 [ -z "$_GAMESRV" -a -z "$_QUERYPORT" ] && _MYECHO -c red -p "Missing Server:Port args.. exit" && exit 1
 
-# Get server status with python SteamQuery libs
-[ "$_NUMCHECK" = "true" ] || _MYECHO "Online Status"
+# Get server status with python SteamQuery lib
+[ "$_NUMCHECK" = "true" ] || _MYECHO "online state"
 steamquery.py $_GAMESRV $_QUERYPORT |tr -d "{|}|'" |tr "," "\n" >${_TMPQUERYFILE}
 grep -q "^error:" ${_TMPQUERYFILE} && { [ "$_NUMCHECK" = "true" ] || _KO; exit 1; } || [ "$_NUMCHECK" = "true" ] || _OK
 
@@ -139,11 +138,11 @@ grep -q "^error:" ${_TMPQUERYFILE} && { [ "$_NUMCHECK" = "true" ] || _KO; exit 1
 if [ "$_USERCHECK" = "true" ]; then
 _SRVNAME=$(cat ${_TMPQUERYFILE} |awk -F': ' '/name/ {print $NF}')
 _USERS=$(grep "^ players" ${_TMPQUERYFILE} |awk -F': ' '{print $NF}')
-_MYECHO "Server Name" && echo "$_SRVNAME"
-_MYECHO "server_version" && echo "$_CURRENTVERSION"
-_MYECHO "Connected Users" && echo "$_USERS"
+_MYECHO "server name" && echo "$_SRVNAME"
+_MYECHO "server version" && echo "$_CURRENTVERSION"
+_MYECHO "connected users" && echo "$_USERS"
 if [ "$_USERS" -gt 0 ] && [ -z "$_FAILCHECK" ]; then
-  _MYECHO "Usernames"
+  _MYECHO "username(s)"
   echo "$_GETACTIVEUSERS"
   echo
 fi
@@ -156,11 +155,12 @@ while read QUERYLINE; do
   _VALUE=$(awk -F': ' '{print $2}' <<<$QUERYLINE)
   [ -z "$_VALUE" ] && _VALUE="default"
   [ $_NAME = online ] && continue 
-  _MYECHO "$_NAME" && echo "$_VALUE"
+  _MYECHO "$_NAME" |tr "_" " " && echo "$_VALUE"
   if [ $_NAME = players ]; then
     [ $_VALUE -gt 0 ] && _SHOWPLAYERS="true"
   fi
 done <${_TMPQUERYFILE}
-_MYECHO "server_version" && echo "$_CURRENTVERSION"
-[ "$_SHOWPLAYERS" = true -a -z "$_FAILCHECK" ] && { _MYECHO "Usernames"; echo "$_GETACTIVEUSERS"; }
+_MYECHO "server version" && echo "$_CURRENTVERSION"
+[ "$_SHOWPLAYERS" = true -a -z "$_FAILCHECK" ] && { _MYECHO "username(s)"; echo "$_GETACTIVEUSERS"; }
 echo
+
