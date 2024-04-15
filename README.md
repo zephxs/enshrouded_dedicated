@@ -13,7 +13,7 @@ Client-Side:
 
 <br />
 <br />
-### `enshrd_query and steamquery.py`
+### enshrd_query + steamquery.py
 
 - [x] Show Server_Query infos (cf. https://developer.valvesoftware.com/wiki/Server_Queries)
 - [x] Show Currently connected Username(s)
@@ -21,9 +21,30 @@ Client-Side:
 > [!NOTE]
 > requires: python3 `pip` for SteamQuery lib install and use, `ssh access` to the server (preferably with a running agent), 
 
+
+<p style="color:#0000FF">######################### Enshrouded Server Query ##########################</p>
+# query type                               = [remote]
+# ssh infos                                = [OK]
+# online state                             = [OK]
+# ip                                       = dedicated.server.net
+# port                                     = 15637
+# name                                     = My Enshrouded World
+# map                                      = default
+# game                                     = Enshrouded
+# description                              = Enshrouded
+# players                                  = 3
+# max players                              = 8
+# bots                                     = 0
+# password required                        = True
+# vac secure                               = False
+# server type                              = Dedicated
+# os                                       = Windows
+# server version                           = 511168
+# username(s)                              = user1 user2 user3
+
 <br />
 <br />
-### `enshrd_steamuser_check`
+### enshrd_steamuser_check
 
 - [x] Monitor enshroudedserver.log for [successfull/failed] connection attempts
 - [x] maintain a list of currently logged in Usernames
@@ -42,7 +63,7 @@ Client-Side:
 
 <br />
 <br />
-### `enshrd_backupgrade`
+### enshrd_backupgrade
 
 - [x] Auto backup Map files (server 'savegame' folder)
 - [x] Auto Update Game Server Files with SteamCMD if Steam Game Repository show a new update
