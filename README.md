@@ -78,6 +78,7 @@ $cat ~/enshrd-monitor/user-connection.log
 
 _Sample logs:_
 ```
+$cat ~/enshrd-monitor/update.log
 [2024-04-15 04:05:32] [START] Enshrouded server Backup / Update started
 [2024-04-15 04:05:32] [INFO] Current version: 511168
 [2024-04-15 04:05:32] [INFO] Steam Game Repo last update: Thu Mar 28 10:35:39 UTC 2024
