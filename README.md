@@ -56,6 +56,7 @@ $cat ~/enshrd-monitor/user-connection.log
 [2024-04-15 10:31:36] [INFO] User Connected = Ares 0(1)
 [2024-04-15 11:57:34] [INFO] User Logout = Ares
 ```
+
 <br />
 <br />
 
@@ -74,6 +75,7 @@ $cat ~/enshrd-monitor/user-connection.log
 > ```
 
 <br />
+
 _Sample logs:_
 ```
 [2024-04-15 04:05:32] [START] Enshrouded server Backup / Update started
