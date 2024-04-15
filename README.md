@@ -44,7 +44,9 @@ screenshot:
 > ```
 >
 > telegram-alert sample script can be found here :
-> `https://raw.githubusercontent.com/zephxs/ncat-ipset-honeypot/master/telegram-send`
+> ```
+> https://raw.githubusercontent.com/zephxs/ncat-ipset-honeypot/master/telegram-send
+> ```
 
 <br />
 
@@ -68,7 +70,9 @@ $cat ~/enshrd-monitor/user-connection.log
 
 > [!TIP]
 > Crontab every day @4h30 AM :
-> `30 4 * * * /usr/local/sbin/enshrd_backupgrade`
+> ```
+> 30 4 * * * /usr/local/sbin/enshrd_backupgrade
+> ```
 
 <br />
 
