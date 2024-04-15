@@ -1,0 +1,88 @@
+#!/bin/bash
+# Upgrade Server on new release (https://api.steamcmd.net/v1/info/2278520)
+# Backup savegame (after shutdown)
+#
+### v0.1 - enshrouded server update/reboot script
+#
+# crontab @4AM every day
+# 0 4 * * * /usr/local/bin/enshrd_backupgrade 
+
+_USERDIR="/home/enshrouded"
+_STEAMCMD="${_USERDIR}/steamcmd/steamcmd.sh"
+_WKGDIR="${_USERDIR}/enshrd-monitor"
+_SAVEBKPDIR="${_USERDIR}/enshrd-bak"
+_GAMEDIR="${_USERDIR}/enshroudedserver"
+_LOGFILE="${_WKGDIR}/update.log"
+_LOCKFILE="/tmp/.enshrd_updater.lock"
+_SERVICEFILE="enshrd.service"
+
+### PRE
+_LOGTHIS(){
+local _LEVEL="$1"
+local _MESSAGE="$2"
+local _TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+printf "[${_TIMESTAMP}] [${_LEVEL}] ${_MESSAGE}\n" >>$_LOGFILE
+}
+
+[ -x "$_STEAMCMD" ] ||  { _LOGTHIS FAIL "SteamCMD not Found.."; exit 1; }
+[ -d "${_GAMEDIR}/savegame" ] || { _LOGTHIS FAIL "Enshrouded 'savegame' dir not found.."; exit 1; }
+[ -d "$_WKGDIR" ] || mkdir -p $_WKGDIR
+[ -d "$_SAVEBKPDIR" ] || mkdir -p $_SAVEBKPDIR
+
+# lockfile
+if [ -e "$_LOCKFILE" ]; then
+_PID=$(cat ${_LOCKFILE})
+ps -p $_PID -o pid= >/dev/null 2>&1
+  if [ $? -eq 0 ]; then
+    _LOGTHIS FAIL "Process is already running.."
+    exit
+  fi
+fi
+echo $$ >$_LOCKFILE
+trap 'rm -f "$_LOCKFILE"' EXIT
+
+# check script
+type enshrd_query >/dev/null || { echo -e "[$(date '+%d-%m-%Y %H:%M:%S')] Script 'enshrd_query' not found in PATH.. exit" >>$_LOGFILE; exit 1; }
+
+
+_ENSHRDUPDATE(){
+_LOGTHIS INFO "SteamCMD Update Starting"
+$_STEAMCMD +@sSteamCmdForcePlatformType windows +force_install_dir $_GAMEDIR +login anonymous +app_update 2278520 +quit >> ${_WKGDIR}/steamcmd-last-update.txt
+_LOGTHIS INFO "SteamCMD Update Finished!"
+}
+
+_LASTGAMEUPDATE=$(date -d @$(curl -s https://api.steamcmd.net/v1/info/2278520 | jq '.data."2278520".depots.branches.public.timeupdated' |tr -d '"'))
+_CURRENTVERSION=$(grep SVN ${_GAMEDIR}/logs/enshrouded_server.log | awk '{print $NF}')
+
+# Main
+_LOGTHIS INFO "Enshrouded server Backup / Update started"
+_LOGTHIS INFO "Current version: $_CURRENTVERSION"
+_LOGTHIS INFO "Steam Game Repo last update: $_LASTGAMEUPDATE"
+# Abort if player are connected
+if [ "$(enshrd_query -n)" -ne 0 ]; then
+  _LOGTHIS WARN "Active User(s) detected: $(cat ${_WKGDIR}/connected-users), abort.."
+  exit 1 
+fi
+# stop service and backup map
+_LOGTHIS INFO "Stopping service: $_SERVICEFILE"
+sudo systemctl stop $_SERVICEFILE
+sleep 5
+_LOGTHIS INFO "Backuping Map files: ${_SAVEBKPDIR}/$(date +%d%m%Y-%H%M).zip"
+zip -r ${_SAVEBKPDIR}/Enshrouded-map_$(date +%d%m%Y-%H%M).zip  ${_GAMEDIR}/savegame/*
+# Make update only if steam game repo have been updated within last 24h (as this script is meant to run every day)
+if [ "$(date  -d "$_LASTGAMEUPDATE" +'%s')" -ge "$(date  +'%s' --date="-1 day")" ]; then
+  _ENSHRDUPDATE
+else
+  _LOGTHIS INFO "Steam Repo Check : Update not needed.."
+fi
+_LOGTHIS INFO "Restarting service: $_SERVICEFILE"
+sudo systemctl start $_SERVICEFILE
+# wait for server start
+counter="0"
+while ! grep -q SVN ${_GAMEDIR}/logs/enshrouded_server.log; do
+	sleep 3
+	counter=$((counter+1))
+	[ "$counter" = 20 ] && break
+done
+_LOGTHIS INFO "Enshrouded Server [Version:$(grep SVN ${_GAMEDIR}/logs/enshrouded_server.log | awk '{print $NF}')] - Backup/Update Complete! "
+
