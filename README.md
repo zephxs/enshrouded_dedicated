@@ -10,9 +10,13 @@ Simple shell scripts to monitor Enshrouded dedicated servers:
 
 requires: 
 
-python3 'pip' for SteamQuery lib install 
+python3 'pip' for SteamQuery lib install
+
 ssh access to the server (agent running)
+
 the script 'steamquery.py' from this repository in the PATH
+
+
 
 
 
