@@ -54,7 +54,7 @@ _GET_LOGDIFF
 if grep '\[online\] Client' ${_WKGDIR}/log_news | grep -q 'authenticated by steam'; then
   # Get New Player Handler
   _NEWUSERIDS=($(awk '/Remote player added. Player handle/ {print $NF}' ${_WKGDIR}/log_news))
-  [ -z "${_NEWUSERIDS[@]}" ] && exit 0 || echo -e "[$(date '+%d/%m/%Y %H:%M')] New ID(s) detected = ${_NEWUSERIDS[@]}" >> ${_WKGDIR}/user-connection.log
+  [ -z "${_NEWUSERIDS[*]}" ] && exit 0 || echo -e "[$(date '+%d/%m/%Y %H:%M')] New ID(s) detected = ${_NEWUSERIDS[@]}" >> ${_WKGDIR}/user-connection.log
   # sleep 5 sec for if the connection just occurs
   sleep 5 && _GET_LOGDIFF
   for _STEAMID in "${_NEWUSERIDS[@]}"; do
