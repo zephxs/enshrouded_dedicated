@@ -22,7 +22,7 @@ Client-Side:
 > [!NOTE]
 > requires: python3 `pip` for SteamQuery lib install and use, `ssh access` to the server (preferably with a running agent), 
 
-
+![script run](/assets/steamq.png)
 <br />
 <br />
 
