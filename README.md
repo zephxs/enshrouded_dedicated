@@ -23,24 +23,24 @@ Client-Side:
 
 
 <p style="color:#0000FF">######################### Enshrouded Server Query ##########################</p>
-# query type                               = [remote]
-# ssh infos                                = [OK]
-# online state                             = [OK]
-# ip                                       = dedicated.server.net
-# port                                     = 15637
-# name                                     = My Enshrouded World
-# map                                      = default
-# game                                     = Enshrouded
-# description                              = Enshrouded
-# players                                  = 3
-# max players                              = 8
-# bots                                     = 0
-# password required                        = True
-# vac secure                               = False
-# server type                              = Dedicated
-# os                                       = Windows
-# server version                           = 511168
-# username(s)                              = user1 user2 user3
+<p># query type                               = [remote]</p>
+<p># ssh infos                                = [OK]</p>
+<p># online state                             = [OK]</p>
+<p># ip                                       = dedicated.server.net</p>
+<p># port                                     = 15637</p>
+<p># name                                     = My Enshrouded World</p>
+<p># map                                      = default</p>
+<p># game                                     = Enshrouded</p>
+<p># description                              = Enshrouded</p>
+<p># players                                  = 3</p>
+<p># max players                              = 8</p>
+<p># bots                                     = 0</p>
+<p># password required                        = True</p>
+<p># vac secure                               = False</p>
+<p># server type                              = Dedicated</p>
+<p># os                                       = Windows</p>
+<p># server version                           = 511168</p>
+<p># username(s)                              = user1 user2 user3</p>
 
 <br />
 <br />
