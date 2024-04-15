@@ -48,6 +48,8 @@ _STEAMUSER=$(curl -f -s https://steamid.io/lookup/$_STEAMSRC | grep -A1 ' <dt cl
 
 ### MAIN
 _GET_LOGDIFF
+# exit if no new logs found
+[ -s "${_WKGDIR}/log_news" ] || exit 0
 # If New Client login detected, parse new logs
 if grep '\[online\] Client' ${_WKGDIR}/log_news | grep -q 'authenticated by steam'; then
   # Get New Player Handler
