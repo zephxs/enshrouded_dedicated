@@ -93,7 +93,7 @@ if [ -z "$_NUMCHECK" ]; then
   [ "$_SERVERSIDE" = "true" ] && echo "[local]" || echo "[remote]"
 fi
 # Auto set server to localhost if '-l'
-[ "$_SERVERSIDE" = "true" ] && _GAMESRV="localhost" ||  _GETSSHINFO=$(ssh -t $_SSHALIAS "awk '/SVN/ {print \$NF}' ${_GAMEDIR}/logs/enshrouded_server.log; echo '#'; cat ${_WKGDIR}/connected-users |tr '\n' ' '" 2>/dev/null &)
+[ "$_SERVERSIDE" = "true" ] && _GAMESRV="localhost" ||  _GETSSHINFO=$(ssh -t $_SSHALIAS "awk '/SVN/ {print \$NF}' ${_GAMEDIR}/logs/enshrouded_server.log; echo -e '#\c'; cat ${_WKGDIR}/connected-users |tr '\n' ' '" 2>/dev/null &)
 
 
 ### MAIN
