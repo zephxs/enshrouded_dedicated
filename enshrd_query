@@ -1,5 +1,6 @@
 #!/bin/bash
 ### Get Server_Query infos and Currently connected User list
+# v0.5 - added '-n' to only output the number of connected user : used for server update and restart
 # v0.4 - added 'user-only' check, and show connected-users list (require ssh-agent running for no pass)
 # v0.3 - added auto install prerequisites (only pip is needed in first place) and failed query / Online status
 # v0.2 - added args to bash and py, usage, and vars
@@ -38,14 +39,16 @@ _MYECHO "$(basename $0) -s <server> -p <port>"
 _MYECHO -p "Same with defined aguments"
 _MYECHO "$(basename $0) <server>:<port> -u"
 _MYECHO -p "Query only currently connected users"
+_MYECHO "$(basename $0) localhost:<port> -n"
+_MYECHO -p "Output only the number of connected users (used for scripting server restart/update)"
 }
 
-# Title and Args parse
-_MYECHO -t "SteamQuery"
+# Args parse
 while (( "$#" )); do
   case "$1" in
   -h|--help) _SCRIPTUSAGE; exit 0;;
   -u|--users) _USERCHECK="true"; shift 1;;
+  -n|--number) _NUMCHECK="true"; shift 1;;
   -s|--server) _GAMESRV="${1}"; shift 1;;
   -p|--port) _QUERYPORT="${1}"; shift 1;;
   -*|--*) _MYECHO -c red -p "Flag not recognised.." >&2; _SCRIPTUSAGE; exit 1 ;;
@@ -59,18 +62,28 @@ while (( "$#" )); do
   esac
 done
 
+# Title
+[ "$_NUMCHECK" = "true" ] || _MYECHO -t "SteamQuery"
+
 ### FUNCTIONS
 # launch ssh query in background to get usernames for quick use if needed
-_GETACTIVEUSERS=$(ssh -t $_GAMESRV 'cat enshrd-monitor/connected-user |tr "\n" " "' 2>/dev/null &)
+[ "$_NUMCHECK" = "true" ] || _GETACTIVEUSERS=$(ssh -t $_GAMESRV 'cat enshrd-monitor/connected-user |tr "\n" " "' 2>/dev/null &)
 
 ### MAIN
 # test gameserver and port variables
 [ -z "$_GAMESRV" -a -z "$_QUERYPORT" ] && _MYECHO -c red -p "Missing Server:Port args.. exit" && exit 1
 
 # Get server status with python SteamQuery libs
-_MYECHO "Online Status"
+[ "$_NUMCHECK" = "true" ] || _MYECHO "Online Status"
 steamquery.py $_GAMESRV $_QUERYPORT |tr -d "{|}|'" |tr "," "\n" >${_TMPQUERYFILE}
-grep -q "^error:" ${_TMPQUERYFILE} && { _KO; exit 1; } || _OK
+if grep -q "^error:" ${_TMPQUERYFILE}; then
+[ "$_NUMCHECK" = "true" ] || _KO; exit 1
+else
+[ "$_NUMCHECK" = "true" ] || _OK
+fi
+
+# Number of users only 
+[ "$_NUMCHECK" = "true" ] && grep "^ players" ${_TMPQUERYFILE} |awk -F': ' '{print $NF}' && exit 0
 
 # Users only check
 if [ "$_USERCHECK" = "true" ]; then
