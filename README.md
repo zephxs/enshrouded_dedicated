@@ -39,7 +39,7 @@ screenshot:
 
 > [!TIP]
 > Crontab every minute :
-> `*/1 * * * * /usr/local/sbin/enshrd_steamuser_check`
+> ```*/1 * * * * /usr/local/sbin/enshrd_steamuser_check```
 >
 > telegram-alert sample script can be found here :
 > `https://raw.githubusercontent.com/zephxs/ncat-ipset-honeypot/master/telegram-send`
