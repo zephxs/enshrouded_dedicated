@@ -49,12 +49,13 @@ enshrd_query screenshot:
 > ```
 
 <br />
-> Sample logs:
-> cat ~/enshrd-monitor/user-connection.log
-> \[2024-04-15 10:31:30] [INFO] New ID(s) detected = 0(1)
-> \[2024-04-15 10:31:36] [INFO] User Connected = Ares 0(1)
-> \[2024-04-15 11:57:34] [INFO] User Logout = Ares
-
+Sample logs:
+```
+$cat ~/enshrd-monitor/user-connection.log
+[2024-04-15 10:31:30] [INFO] New ID(s) detected = 0(1)
+[2024-04-15 10:31:36] [INFO] User Connected = Ares 0(1)
+[2024-04-15 11:57:34] [INFO] User Logout = Ares
+```
 <br />
 <br />
 
@@ -74,12 +75,14 @@ enshrd_query screenshot:
 
 <br />
 Sample logs:
-> [2024-04-15 04:05:32] [START] Enshrouded server Backup / Update started
-> [2024-04-15 04:05:32] [INFO] Current version: 511168
-> [2024-04-15 04:05:32] [INFO] Steam Game Repo last update: Thu Mar 28 10:35:39 UTC 2024
-> [2024-04-15 04:05:32] [INFO] Active User(s) detected: '0'
-> [2024-04-15 04:05:32] [INFO] Stopping service: enshrd.service
-> [2024-04-15 04:07:08] [INFO] Backuping Map files: /home/enshrouded/enshrd-bak/Enshrouded_Map-15042024-0407.zip
-> [2024-04-15 04:07:08] [INFO] Steam Repo Check: Update not needed
-> [2024-04-15 04:07:08] [INFO] Restarting service: enshrd.service
-> [2024-04-15 04:07:08] [END] Enshrouded Server [Version:511168] - Backup/Update Complete!
+```
+[2024-04-15 04:05:32] [START] Enshrouded server Backup / Update started
+[2024-04-15 04:05:32] [INFO] Current version: 511168
+[2024-04-15 04:05:32] [INFO] Steam Game Repo last update: Thu Mar 28 10:35:39 UTC 2024
+[2024-04-15 04:05:32] [INFO] Active User(s) detected: '0'
+[2024-04-15 04:05:32] [INFO] Stopping service: enshrd.service
+[2024-04-15 04:07:08] [INFO] Backuping Map files: /home/enshrouded/enshrd-bak/Enshrouded_Map-15042024-0407.zip
+[2024-04-15 04:07:08] [INFO] Steam Repo Check: Update not needed
+[2024-04-15 04:07:08] [INFO] Restarting service: enshrd.service
+[2024-04-15 04:07:08] [END] Enshrouded Server [Version:511168] - Backup/Update Complete!
+```
