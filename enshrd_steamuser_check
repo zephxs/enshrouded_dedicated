@@ -78,7 +78,13 @@ fi
 ### MAIN
 _GET_LOGDIFF
 # exit if no new logs found
-[ -s "${_WKGDIR}/log_news" ] || exit 0
+if [ -s "${_WKGDIR}/log_news" ]; then
+  # and if service is down, empty connected user list before exit
+  if ! sudo systemctl is-active enshrd.service; then
+    >$_CONNECTED_USERS
+  fi
+exit 0
+fi
 # If New Client login detected parse new logs
 if grep '\[online\] Client' ${_WKGDIR}/log_news | grep -q 'authenticated by steam'; then
   # Get New Player Handler or exit
