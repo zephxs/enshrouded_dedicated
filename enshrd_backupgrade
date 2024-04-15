@@ -59,7 +59,7 @@ _LOGTHIS INFO "Enshrouded server Backup / Update started"
 _LOGTHIS INFO "Current version: $_CURRENTVERSION"
 _LOGTHIS INFO "Steam Game Repo last update: $_LASTGAMEUPDATE"
 # Abort if player are connected
-if [ "$(enshrd_query -n)" -ne 0 ]; then
+if [ "$(enshrd_query -l -n)" -ne 0 ]; then
   _LOGTHIS WARN "Active User(s) detected: $(cat ${_WKGDIR}/connected-users), abort.."
   exit 1 
 fi

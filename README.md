@@ -1,6 +1,6 @@
-# enshrouded_dedicated tools
+# enshrouded_dedicated toolset
 
-Simple shell scripts to monitor Enshrouded dedicated servers:
+Simple Shell script-set to "Monitor / Backup / Update" Enshrouded dedicated servers :
 
 
 # "enshrd_query" :
@@ -17,7 +17,7 @@ ssh access to the server (agent running), and the script 'steamquery.py' from th
 
 - Monitor enshroudedserver.log for [successfull/failed] connection attempts
 - maintain a list of currently logged in Usernames
-- (Optional) send custom message to telegram channel on [Login/Logout]
+- (Optional) send custom message to telegram channel on [User Login/Logout]
 
 ### Crontab every minute :
 ```
@@ -27,3 +27,17 @@ ssh access to the server (agent running), and the script 'steamquery.py' from th
 ```
 https://raw.githubusercontent.com/zephxs/ncat-ipset-honeypot/master/telegram-send
 ```
+
+
+# "enshrd_backupgrade" :
+
+- Auto backup Map files (server 'savegame' folder)
+- Auto Update Game Server Files with SteamCMD if Steam Game Repository show a new update
+
+requires: 'enshrd_query' to block process if users are connected
+
+### Crontab every day @4h30 AM :
+```
+30 4 * * * /usr/local/sbin/enshrd_backupgrade
+```
+
