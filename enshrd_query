@@ -86,18 +86,14 @@ while (( "$#" )); do
   esac
 done
 
-# Auto set server to localhost if '-l'
+# Title
 if [ -z "$_NUMCHECK" ]; then
-_MYECHO -t "Enshrouded Server Query"
-# local / remote
-_MYECHO "query type" 
-if [ "$_SERVERSIDE" = "true" ]; then
-  echo "[local]"
-  _GAMESRV="localhost"
-else
-  echo "[remote]"
+  _MYECHO -t "Enshrouded Server Query"
+  _MYECHO "query type"
+  [ "$_SERVERSIDE" = "true" ] && echo "[local]" || echo "[remote]"
 fi
-fi
+# Auto set server to localhost if '-l'
+[ "$_SERVERSIDE" = "true" ] && _GAMESRV="localhost"
 
 ### MAIN
 # Get connected user and server version
