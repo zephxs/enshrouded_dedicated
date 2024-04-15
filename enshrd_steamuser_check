@@ -20,13 +20,13 @@ _ENSHRD_LOGFILE="${_GAMEDIR}/logs/enshrouded_server.log"        # Enshrouded ser
 _WKGDIR="/home/enshrouded/enshrd-monitor"                       # Monitoring folder used by script set
 _CONNECTED_USERS="${_WKGDIR}/connected-users"                   # List of Currently Connected Users
 _LOCKFILE="/tmp/enshrd_chk.lock"
+_LOG_FILE="${_WKGDIR}/user-connection.log"
 # Disable Telegram-alert
 _TELEGRAM_ALERT="false"                                         # 'telegram-send' script must be in PATH
 
 
 ### PRE
 _LOGTHIS(){
-_LOG_FILE="${_WKGDIR}/user-connection.log"
 local _LEVEL="$1"
 local _MESSAGE="$2"
 local _TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
