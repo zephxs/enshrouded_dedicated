@@ -8,16 +8,9 @@ Simple shell scripts to monitor Enshrouded dedicated servers:
 - Show Server_Query infos (cf. https://developer.valvesoftware.com/wiki/Server_Queries)
 - Show Currently connected User(s)
 
-requires: 
+requires: python3 'pip' for SteamQuery lib install,
 
-python3 'pip' for SteamQuery lib install
-
-ssh access to the server (agent running)
-
-the script 'steamquery.py' from this repository in the PATH
-
-
-
+ssh access to the server (agent running), and the script 'steamquery.py' from this repository in the PATH
 
 
 # "enshrd_steamuser_check" :
