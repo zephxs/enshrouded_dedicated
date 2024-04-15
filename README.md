@@ -35,18 +35,14 @@ enshrd_query screenshot:
 
 - [x] Monitor enshroudedserver.log for [successfull/failed] connection attempts
 - [x] maintain a list of currently logged in Usernames
-- [x] \(Optional) send custom message to telegram channel on User Login/Logout
+- [x] Optional - send custom message to telegram channel on User Login/Logout
 
 > [!TIP]
 > Crontab every minute :
-> ```
 > */1 * * * * /usr/local/sbin/enshrd_steamuser_check
-> ```
 >
 > telegram-alert sample script can be found here :
-> ```
 > https://raw.githubusercontent.com/zephxs/ncat-ipset-honeypot/master/telegram-send
-> ```
 
 <br />
 Sample logs:
@@ -69,9 +65,7 @@ $cat ~/enshrd-monitor/user-connection.log
 
 > [!TIP]
 > Crontab every day @4h30 AM :
-> ```
 > 30 4 * * * /usr/local/sbin/enshrd_backupgrade
-> ```
 
 <br />
 Sample logs:
