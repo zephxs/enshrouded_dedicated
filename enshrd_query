@@ -97,6 +97,7 @@ if [ "$_SERVERSIDE" = "true" ]; then
 else
   echo "[remote]"
 fi
+fi
 
 ### MAIN
 # Get connected user and server version
