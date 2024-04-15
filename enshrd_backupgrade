@@ -55,7 +55,7 @@ _LASTGAMEUPDATE=$(date -d @$(curl -s https://api.steamcmd.net/v1/info/2278520 | 
 _CURRENTVERSION=$(grep SVN ${_GAMEDIR}/logs/enshrouded_server.log | awk '{print $NF}')
 
 # Main
-_LOGTHIS INFO "Enshrouded server Backup / Update started"
+_LOGTHIS START "Enshrouded server Backup / Update started"
 _LOGTHIS INFO "Current version: $_CURRENTVERSION"
 _LOGTHIS INFO "Steam Game Repo last update: $_LASTGAMEUPDATE"
 # Abort if player are connected
@@ -84,5 +84,5 @@ while ! grep -q SVN ${_GAMEDIR}/logs/enshrouded_server.log; do
 	counter=$((counter+1))
 	[ "$counter" = 20 ] && break
 done
-_LOGTHIS INFO "Enshrouded Server [Version:$(grep SVN ${_GAMEDIR}/logs/enshrouded_server.log | awk '{print $NF}')] - Backup/Update Complete! "
+_LOGTHIS END "Enshrouded Server [Version:$(grep SVN ${_GAMEDIR}/logs/enshrouded_server.log | awk '{print $NF}')] - Backup/Update Complete! "
 
