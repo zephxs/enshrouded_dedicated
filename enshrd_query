@@ -1,21 +1,38 @@
 #!/bin/bash
-### Get Server_Query infos and Currently connected User list
-# v0.5 - added '-n' to only output the number of connected user : used for server update and restart
-# v0.4 - added 'user-only' check, and show connected-users list (require ssh-agent running for no pass)
-# v0.3 - added auto install prerequisites (only pip is needed in first place) and failed query / Online status
-# v0.2 - added args to bash and py, usage, and vars
-# v0.1 - POC
+# Get Enshrouded Server infosi (via steamquery) and Currently connected User list + server version (via ssh)
+# Require 'pip' for getting steamquery library and 'ssh' access to the server
+#
 
-# VARS (_GAMESRV and _QUERYPORT used to run the query script without arguments
-_GAMESRV="your.dedicated.server"
-_QUERYPORT="15637"
+### v0.6 - added serverside run (used for updateand backup server only if no user are connected)
+### v0.5 - added '-n' to only output the number of connected user : used for server update and restart
+### v0.4 - added user check and display from server connected-users list
+### v0.3 - added auto install prerequisites (only pip is needed in first place) and failed query / Online status
+### v0.2 - added args to bash an py, usage, and vars
+### v0.1 - POC
+
+### VARS (Important: has to match your install)
+# Server infos:
+_GAMESRV="dedicated_enshrouded-server.net"    # put "localhost" for serverside queries
+_QUERYPORT="15637"    # Query port defined on your server
+
+_SSHALIAS="$_GAMESRV"    # SSH server alias (set if different from server name)
+
+# tmp file location
 _TMPQUERYFILE="/tmp/.steamquery.log"
+
+# Enshrouded Server location info
+_GAMEUSERDIR="/home/enshrouded"    # Enshrouded server User homedir
+_GAMEDIR="${_GAMEUSERDIR}/enshroudedserver"    # Enshrouded Server directory
+
+# Set _SERVERSIDE to "true" to run script on the server directly (or use '-l')
+_SERVERSIDE=""
+
 
 # PREREQ
 # install SteamQuery python lib via pip (mantadory)
 type pip >/dev/null || { echo -e "Python 'pip' not found, and is required for SteamQuery library install\n  exiting.."; exit 1; }
 if ! pip show SteamQuery >/dev/null 2>&1; then pip install SteamQuery; fi
-# Load myecho function for nicer output
+# Load myecho for nicer output
 if ! type _MYECHO >/dev/null 2>&1; then
   if [ -f "/etc/profile.d/01-myecho-colors.sh" ]; then
     source /etc/profile.d/01-myecho-colors.sh >/dev/null 2>&1
@@ -32,26 +49,32 @@ fi
 
 # Usage
 _SCRIPTUSAGE(){
-_MYECHO -c green -p "Usage:"
-_MYECHO "$(basename $0) <server>:<port>"
-_MYECHO -p "Query All Steam Server Infos"
-_MYECHO "$(basename $0) -s <server> -p <port>"
-_MYECHO -p "Same with defined aguments"
-_MYECHO "$(basename $0) <server>:<port> -u"
-_MYECHO -p "Query only currently connected users"
-_MYECHO "$(basename $0) localhost:<port> -n"
-_MYECHO -p "Output only the number of connected users (used for scripting server restart/update)"
+_MYECHO -c green -p "Server:"
+echo "  -s|--server <Ip-Hostname>"
+echo -e "  -p|--port   <query_port>\n"
+_MYECHO -p "  exemple: \"$(basename $0) <server>:<port>\""
+_MYECHO -p "  or: \"$(basename $0) -s <server> -p <port>\""
+echo -e "*** Server infos can be set in script variable to avoid input\n"
+_MYECHO -c green -p "Mode:"
+echo "  No Argument [default]"
+_MYECHO -p "  # Query All Steam Server Infos"
+echo -e "\n  -u|--user"
+_MYECHO -p "  # Query currently connected user(s)"
+echo -e "\n  -n|--number"
+_MYECHO -p "  # Output only the number [0-9] of connected users (used locally for server restart/update)"
+echo -e "\n  -l|--local"
+_MYECHO -p "  # Used for server-side local run"
 }
 
 # Args parse
 while (( "$#" )); do
   case "$1" in
+  -s|--server) _GAMESRV="${2}"; shift 2;;
+  -p|--port) _QUERYPORT="${2}"; shift 2;;
   -h|--help) _SCRIPTUSAGE; exit 0;;
   -u|--users) _USERCHECK="true"; shift 1;;
   -n|--number) _NUMCHECK="true"; shift 1;;
-  -s|--server) _GAMESRV="${1}"; shift 1;;
-  -p|--port) _QUERYPORT="${1}"; shift 1;;
-  -*|--*) _MYECHO -c red -p "Flag not recognised.." >&2; _SCRIPTUSAGE; exit 1 ;;
+  -l|--local) _SERVERSIDE="true"; shift 1;;
   *) if grep -q ':' <<<$1; then
        _GAMESRV=$(awk -F':' '{print $1}' <<<$1)
        _QUERYPORT=$(awk -F':' '{print $NF}' <<<$1)
@@ -59,15 +82,43 @@ while (( "$#" )); do
      fi
      shift 1
     ;;
+  -*|--*) _MYECHO -c red -p "Flag not recognised.." >&2; _SCRIPTUSAGE; exit 1 ;;
   esac
 done
 
-# Title
-[ "$_NUMCHECK" = "true" ] || _MYECHO -t "SteamQuery"
+if [ -z "$_NUMCHECK" ]; then
+_MYECHO -t "Enshrouded Server Query"
+# local / remote
+_MYECHO "Query type"; 
+[ "$_SERVERSIDE" = "true" ] && echo "[local]" || echo "[remote]"
+fi
 
 ### FUNCTIONS
-# launch ssh query in background to get usernames for quick use if needed
-[ "$_NUMCHECK" = "true" ] || _GETACTIVEUSERS=$(ssh -t $_GAMESRV 'cat enshrd-monitor/connected-user |tr "\n" " "' 2>/dev/null &)
+if [ -z "$_NUMCHECK" ]; then
+  if [ "$_SERVERSIDE" = "true" ]; then
+    _MYECHO "Local files"
+    if [ -f "${_GAMEUSERDIR}/enshrd-monitor/connected-users" ] && [ -f "${_GAMEDIR}/logs/enshrouded_server.log" ]; then
+      _OK
+      _GETACTIVEUSERS=$(cat ${_GAMEUSERDIR}/enshrd-monitor/connected-users |tr "\n" " ")
+      _CURRENTVERSION=$(awk '/SVN/ {print $NF}' ${_GAMEDIR}/logs/enshrouded_server.log)
+    else
+      _FAILCHECK="true"
+      _KO ":files not found.. Will NOT display Usernames and Server Version"
+    fi
+  else
+    _MYECHO "Ssh access"
+    ssh -t -o ConnectTimeout=2 "$_SSHALIAS" 'exit' 2>/dev/null
+    if [ "$?" -eq 0 ]; then
+      _OK
+      _GETACTIVEUSERS=$(ssh -t $_SSHALIAS "cat ${_GAMEUSERDIR}/connected-users |tr '\n' ' '" 2>/dev/null &)
+      _CURRENTVERSION=$(ssh -t $_SSHALIAS "awk '/SVN/ {print \$NF}' ${_GAMEDIR}/logs/enshrouded_server.log" 2>/dev/null &)
+    else
+      _FAILCHECK="true"
+      _KO ":SSH Alias not working.. Will NOT display Usernames and Server Version"
+    fi
+  fi
+fi
+
 
 ### MAIN
 # test gameserver and port variables
@@ -76,22 +127,17 @@ done
 # Get server status with python SteamQuery libs
 [ "$_NUMCHECK" = "true" ] || _MYECHO "Online Status"
 steamquery.py $_GAMESRV $_QUERYPORT |tr -d "{|}|'" |tr "," "\n" >${_TMPQUERYFILE}
-if grep -q "^error:" ${_TMPQUERYFILE}; then
-[ "$_NUMCHECK" = "true" ] || _KO; exit 1
-else
-[ "$_NUMCHECK" = "true" ] || _OK
-fi
+grep -q "^error:" ${_TMPQUERYFILE} && { [ "$_NUMCHECK" = "true" ] || _KO; exit 1; } || [ "$_NUMCHECK" = "true" ] || _OK
 
-# Number of users only 
-[ "$_NUMCHECK" = "true" ] && grep "^ players" ${_TMPQUERYFILE} |awk -F': ' '{print $NF}' && exit 0
-
+[ "$_NUMCHECK" = "true" ] && grep "^ players" ${_TMPQUERYFILE} |awk -F': ' '{print $NF}' && exit 0 
 # Users only check
 if [ "$_USERCHECK" = "true" ]; then
 _SRVNAME=$(cat ${_TMPQUERYFILE} |awk -F': ' '/name/ {print $NF}')
 _USERS=$(grep "^ players" ${_TMPQUERYFILE} |awk -F': ' '{print $NF}')
 _MYECHO "Server Name" && echo "$_SRVNAME"
+_MYECHO "server_version" && echo "$_CURRENTVERSION"
 _MYECHO "Connected Users" && echo "$_USERS"
-if [ "$_USERS" -gt 0 ]; then 
+if [ "$_USERS" -gt 0 ] && [ -z "$_FAILCHECK" ]; then
   _MYECHO "Usernames"
   echo "$_GETACTIVEUSERS"
   echo
@@ -101,14 +147,15 @@ fi
 
 # Parse all Server Infos
 while read QUERYLINE; do
-_NAME=$(awk -F': |:' '{print $1}' <<<$QUERYLINE)
-_VALUE=$(awk -F': ' '{print $2}' <<<$QUERYLINE)
-[ -z "$_VALUE" ] && _VALUE="default"
-[ $_NAME = online ] && continue 
-_MYECHO "$_NAME" && echo "$_VALUE"
-if [ $_NAME = players ]; then
-[ $_VALUE -gt 0 ] && _SHOWPLAYERS="true"
-fi
+  _NAME=$(awk -F': |:' '{print $1}' <<<$QUERYLINE)
+  _VALUE=$(awk -F': ' '{print $2}' <<<$QUERYLINE)
+  [ -z "$_VALUE" ] && _VALUE="default"
+  [ $_NAME = online ] && continue 
+  _MYECHO "$_NAME" && echo "$_VALUE"
+  if [ $_NAME = players ]; then
+    [ $_VALUE -gt 0 ] && _SHOWPLAYERS="true"
+  fi
 done <${_TMPQUERYFILE}
-[ "$_SHOWPLAYERS" = true ] && { _MYECHO "Usernames"; echo "$_GETACTIVEUSERS"; echo; }
-
+_MYECHO "server_version" && echo "$_CURRENTVERSION"
+[ "$_SHOWPLAYERS" = true -a -z "$_FAILCHECK" ] && { _MYECHO "Usernames"; echo "$_GETACTIVEUSERS"; }
+echo
