@@ -17,7 +17,7 @@ Client-Side:
 ### enshrd_query + steamquery.py
 
 - [x] Show Server_Query infos (cf. https://developer.valvesoftware.com/wiki/Server_Queries)
-- [x] Show Currently connected Username(s)
+- [x] Show Currently connected Username ("SteamID to Usename" uses https://steamid.io or Steam directly if API Key is provided)
 
 > [!NOTE]
 > requires: python3 `pip` for SteamQuery lib install and use, `ssh access` to the server (preferably with a running agent), 

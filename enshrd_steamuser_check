@@ -21,7 +21,9 @@ _WKGDIR="/home/enshrouded/enshrd-monitor"                       # Monitoring fol
 _CONNECTED_USERS="${_WKGDIR}/connected-users"                   # List of Currently Connected Users
 _LOCKFILE="/tmp/enshrd_chk.lock"
 _LOG_FILE="${_WKGDIR}/user-connection.log"
-# Disable Telegram-alert
+# [Optional] Steam API key for steamID to Username
+_APIKEY=""                                                      # Will use https://steamid.io if empty 
+# [Optional] Enable Telegram-alert with 'true'
 _TELEGRAM_ALERT="false"                                         # 'telegram-send' script must be in PATH
 
 
@@ -62,9 +64,14 @@ diff ${_WKGDIR}/last_check $_ENSHRD_LOGFILE | grep "^>" >${_WKGDIR}/log_news
 }
 
 _EXTERNAL_ID(){
-# Identify User who tries to login with online service
+# Identify User who tries to login using steam API or online service
 _STEAMSRC=$(grep -B4 ${_NEWHANDLER} ${_WKGDIR}/log_news  | awk -F"'" '/ authenticated by steam/ {print $(NF-1)}')
-_STEAMUSER=$(curl -f -s https://steamid.io/lookup/$_STEAMSRC | grep -A1 ' <dt class="key">name</dt>' | awk -F'>|<' '/value/ {print $(NF-2)}')
+if [ -z "$_STEAMAPIKEY" ]; then
+  _STEAMUSER=$(curl -f -s https://steamid.io/lookup/$_STEAMSRC | grep -A1 ' <dt class="key">name</dt>' | awk -F'>|<' '/value/ {print $(NF-2)}')
+else
+  _STEAMUSER=$(curl -s "http://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=$_STEAMAPIKEY&steamids=$_STEAMSRC"  |jq .response.players.[].personaname |tr -d
+ '"')
+fi
 [ -z "$_STEAMUSER" ] && _STEAMUSER="NotFound"
 }
 
