@@ -3,10 +3,17 @@
 Simple Shell script-set to "Monitor / Backup / Update" Enshrouded dedicated servers.
 
 
-Server-Side: All the scripts work together to collect realtime informations (every minutes), and once a day backup the server map and upgrade server core files if needed (with SteamCMD). They all need to be placed in the PATH of the "enshrouded user" that runs the server binary (enshrouded_server.exe).
+Server-Side: 
+- All the scripts work together to collect realtime informations (every minutes), and once a day backup the server map and upgrade server core files if needed (with SteamCMD). 
+- They all need to be placed in the PATH of the "enshrouded user" that runs the server binary (enshrouded_server.exe).
 
 
-Client-Side: 'enshrd_query' + 'steamquery.py' scripts can be used from any linux manchine to get the server status, infos, and Username(s) that are currently logged in to the server.
+Client-Side: 
+- `enshrd_query` + `steamquery.py` scripts are used to get Enshrouded Server status, base informations, SVN version, and Username(s) that are currently logged in to the server.
+
+
+
+
 
 
 ### "enshrd_query" and "steamquery.py" :
@@ -16,6 +23,8 @@ Client-Side: 'enshrd_query' + 'steamquery.py' scripts can be used from any linux
 
 > [!NOTE]
 > requires: python3 `pip` for SteamQuery lib install and use, `ssh access` to the server (preferably with a running agent), 
+
+
 
 
 ### "enshrd_steamuser_check" :
@@ -29,11 +38,13 @@ Client-Side: 'enshrd_query' + 'steamquery.py' scripts can be used from any linux
 > ```
 > */1 * * * * /usr/local/sbin/enshrd_steamuser_check
 > ```
-> [!TIP]
+>
 > telegram-alert sample script can be found here :
 > ```
 > https://raw.githubusercontent.com/zephxs/ncat-ipset-honeypot/master/telegram-send
 > ```
+
+
 
 
 ### "enshrd_backupgrade" :
@@ -46,7 +57,7 @@ Client-Side: 'enshrd_query' + 'steamquery.py' scripts can be used from any linux
 
 > [!TIP]
 > Crontab every day @4h30 AM :
-```
-30 4 * * * /usr/local/sbin/enshrd_backupgrade
-```
+> ```
+> 30 4 * * * /usr/local/sbin/enshrd_backupgrade
+> ```
 
