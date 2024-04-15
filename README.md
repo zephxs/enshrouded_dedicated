@@ -13,6 +13,7 @@ Client-Side:
 
 <br />
 <br />
+
 ### enshrd_query + steamquery.py
 
 - [x] Show Server_Query infos (cf. https://developer.valvesoftware.com/wiki/Server_Queries)
@@ -22,33 +23,14 @@ Client-Side:
 > requires: python3 `pip` for SteamQuery lib install and use, `ssh access` to the server (preferably with a running agent), 
 
 
-<p style="color:#0000FF">######################### Enshrouded Server Query ##########################</p>
-<p># query type                               = [remote]</p>
-<p># ssh infos                                = [OK]</p>
-<p># online state                             = [OK]</p>
-<p># ip                                       = dedicated.server.net</p>
-<p># port                                     = 15637</p>
-<p># name                                     = My Enshrouded World</p>
-<p># map                                      = default</p>
-<p># game                                     = Enshrouded</p>
-<p># description                              = Enshrouded</p>
-<p># players                                  = 3</p>
-<p># max players                              = 8</p>
-<p># bots                                     = 0</p>
-<p># password required                        = True</p>
-<p># vac secure                               = False</p>
-<p># server type                              = Dedicated</p>
-<p># os                                       = Windows</p>
-<p># server version                           = 511168</p>
-<p># username(s)                              = user1 user2 user3</p>
+<br />
+<br />
 
-<br />
-<br />
 ### enshrd_steamuser_check
 
 - [x] Monitor enshroudedserver.log for [successfull/failed] connection attempts
 - [x] maintain a list of currently logged in Usernames
-- [x] [Optional] send custom message to telegram channel on User Login/Logout
+- [x] \(Optional) send custom message to telegram channel on User Login/Logout
 
 > [!TIP]
 > Crontab every minute :
@@ -63,6 +45,7 @@ Client-Side:
 
 <br />
 <br />
+
 ### enshrd_backupgrade
 
 - [x] Auto backup Map files (server 'savegame' folder)
