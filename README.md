@@ -4,19 +4,16 @@ Simple Shell script-set to "Monitor / Backup / Update" Enshrouded dedicated serv
 
 
 Server-Side: 
-- All the scripts work together to collect realtime informations (every minutes), and once a day backup the server map and upgrade server core files if needed (with SteamCMD). 
+- `All the scripts` work together to collect realtime informations (every minutes), and once a day backup the server map and upgrade server core files if needed (with SteamCMD). 
 - They all need to be placed in the PATH of the "enshrouded user" that runs the server binary (enshrouded_server.exe).
 
 
 Client-Side: 
 - `enshrd_query` + `steamquery.py` scripts are used to get Enshrouded Server status, base informations, SVN version, and Username(s) that are currently logged in to the server.
 
-
-
-
 <br />
 <br />
-### `enshrd_query` and `steamquery.py` :
+### `enshrd_query and steamquery.py` :
 
 - [x] Show Server_Query infos (cf. https://developer.valvesoftware.com/wiki/Server_Queries)
 - [x] Show Currently connected Username(s)
@@ -24,9 +21,8 @@ Client-Side:
 > [!NOTE]
 > requires: python3 `pip` for SteamQuery lib install and use, `ssh access` to the server (preferably with a running agent), 
 
-
-
-
+<br />
+<br />
 ### `enshrd_steamuser_check` :
 
 - [x] Monitor enshroudedserver.log for [successfull/failed] connection attempts
@@ -44,9 +40,8 @@ Client-Side:
 > https://raw.githubusercontent.com/zephxs/ncat-ipset-honeypot/master/telegram-send
 > ```
 
-
-
-
+<br />
+<br />
 ### `enshrd_backupgrade` :
 
 - [x] Auto backup Map files (server 'savegame' folder)
