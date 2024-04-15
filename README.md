@@ -26,14 +26,14 @@ Client-Side: 'enshrd_query' + 'steamquery.py' scripts can be used from any linux
 
 > [!TIP]
 > Crontab every minute :
-```
-*/1 * * * * /usr/local/sbin/enshrd_steamuser_check
-```
+> ```
+> */1 * * * * /usr/local/sbin/enshrd_steamuser_check
+> ```
 > [!TIP]
 > telegram-alert sample script can be found here :
-```
-https://raw.githubusercontent.com/zephxs/ncat-ipset-honeypot/master/telegram-send
-```
+> ```
+> https://raw.githubusercontent.com/zephxs/ncat-ipset-honeypot/master/telegram-send
+> ```
 
 
 ### "enshrd_backupgrade" :
