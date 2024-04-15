@@ -89,17 +89,9 @@ if grep '\[online\] Client' ${_WKGDIR}/log_news | grep -q 'authenticated by stea
 
     # else search username
     else
-      counter="0"
-      while true; do
-        _GET_LOGDIFF
-        # Get User Name from logs (Wait until savegame and Character Name has been retrieved
-        _STEAMUSER=$(awk '/Send Character Savegame/ {print $NF}' ${_WKGDIR}/log_news)
-        counter=$((counter+1))
-        [ "$counter" -eq 9 ] && _EXTERNAL_ID && break
-        [ -z "$_STEAMUSER" ] && { sleep 3; continue; } || break
-      done
+      _EXTERNAL_ID
       # log to file and send telegram alert
-      _LOGTHIS INFO "User Connected = $_STEAMUSER"
+      _LOGTHIS INFO "User Connected = $_STEAMUSER $_NEWHANDLER"
       [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "DR34DShrouded Server
 # User Connected = $_STEAMUSER"
       grep -q "$_STEAMUSER" $_CONNECTED_USERS || echo "$_STEAMUSER" >>$_CONNECTED_USERS 
