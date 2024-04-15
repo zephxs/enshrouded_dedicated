@@ -62,18 +62,20 @@ _LOGTHIS INFO "Steam Game Repo last update: $_LASTGAMEUPDATE"
 if [ "$(enshrd_query -l -n)" -ne 0 ]; then
   _LOGTHIS WARN "Active User(s) detected: $(cat ${_WKGDIR}/connected-users), abort.."
   exit 1 
+else
+  _LOGTHIS INFO "Active User(s) detected: '0'"
 fi
 # stop service and backup map
 _LOGTHIS INFO "Stopping service: $_SERVICEFILE"
 sudo systemctl stop $_SERVICEFILE
 sleep 5
-_LOGTHIS INFO "Backuping Map files: ${_SAVEBKPDIR}/$(date +%d%m%Y-%H%M).zip"
+_LOGTHIS INFO "Backuping Map files: ${_SAVEBKPDIR}/Enshrouded_Map-$(date +%d%m%Y-%H%M).zip"
 zip -r ${_SAVEBKPDIR}/Enshrouded-map_$(date +%d%m%Y-%H%M).zip  ${_GAMEDIR}/savegame/*
 # Make update only if steam game repo have been updated within last 24h (as this script is meant to run every day)
 if [ "$(date  -d "$_LASTGAMEUPDATE" +'%s')" -ge "$(date  +'%s' --date="-1 day")" ]; then
   _ENSHRDUPDATE
 else
-  _LOGTHIS INFO "Steam Repo Check : Update not needed.."
+  _LOGTHIS INFO "Steam Repo Check: Update not needed"
 fi
 _LOGTHIS INFO "Restarting service: $_SERVICEFILE"
 sudo systemctl start $_SERVICEFILE
