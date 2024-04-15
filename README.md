@@ -23,9 +23,11 @@ Client-Side:
 > requires: python3 `pip` for SteamQuery lib install and use, `ssh access` to the server (preferably with a running agent), 
 
 <br />
+
 enshrd_query screenshot:
 
 ![script run](/assets/steamq.png)
+
 <br />
 <br />
 
@@ -47,11 +49,11 @@ enshrd_query screenshot:
 > ```
 
 <br />
-Sample logs:
-> $cat ~/enshrd-monitor/user-connection.log
-> [2024-04-15 10:31:30] [INFO] New ID(s) detected = 0(1)
-> [2024-04-15 10:31:36] [INFO] User Connected = Ares 0(1)
-> [2024-04-15 11:57:34] [INFO] User Logout = Ares
+> Sample logs:
+> cat ~/enshrd-monitor/user-connection.log
+> \[2024-04-15 10:31:30] [INFO] New ID(s) detected = 0(1)
+> \[2024-04-15 10:31:36] [INFO] User Connected = Ares 0(1)
+> \[2024-04-15 11:57:34] [INFO] User Logout = Ares
 
 <br />
 <br />
