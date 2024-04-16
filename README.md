@@ -89,3 +89,35 @@ $cat ~/enshrd-monitor/update.log
 [2024-04-15 04:07:08] [INFO] Restarting service: enshrd.service
 [2024-04-15 04:07:08] [END] Enshrouded Server [Version:511168] - Backup/Update Complete!
 ```
+<br />
+<br />
+
+### Server Config for educational purpose : 
+
+<br />
+
+_cat /etc/systemd/system/enshrd.service_
+```
+cat /etc/systemd/system/enshrd.service
+[Unit]
+Description=Enshrouded Server
+Wants=network-online.target
+After=network-online.target
+[Service]
+User=enshrouded
+Group=enshrouded
+Environment="STEAM_COMPAT_CLIENT_INSTALL_PATH=/home/enshrouded/Steam"
+Environment="STEAM_COMPAT_DATA_PATH=/home/enshrouded/Steam/steamapps/compatdata"
+WorkingDirectory=/home/enshrouded/enshroudedserver/
+ExecStart=/home/enshrouded/.steam/root/compatibilitytools.d/Proton-latest/proton run enshrouded_server.exe
+Restart=always
+[Install]
+WantedBy=multi-user.target
+```
+
+<br />
+
+_visudo /etc/sudoers.d/enshrouded-user_
+```
+enshrouded ALL=(ALL) NOPASSWD:/usr/bin/systemctl start enshrd.service,/usr/bin/systemctl stop enshrd.service,/usr/bin/systemctl restart enshrd.service,/usr/bin/systemctl is-active enshrd.service
+```
