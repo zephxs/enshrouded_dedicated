@@ -80,7 +80,7 @@ _GET_LOGDIFF
 # exit if no new logs found
 if [ -s "${_WKGDIR}/log_news" ]; then
   # and if service is down, empty connected user list before exit
-  if ! sudo systemctl is-active enshrd.service; then
+  if [ "$(sudo systemctl is-active enshrd.service)" != "active" ]; then
     >$_CONNECTED_USERS
   fi
 exit 0

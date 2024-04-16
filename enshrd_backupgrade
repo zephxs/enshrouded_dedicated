@@ -69,7 +69,11 @@ fi
 _LOGTHIS INFO "Stopping service: $_SERVICEFILE"
 sudo systemctl stop $_SERVICEFILE
 sleep 5
-_LOGTHIS INFO "Backuping Map files: ${_SAVEBKPDIR}/Enshrouded_Map-$(date +%d%m%Y-%H%M).zip"
+# Clean monitoring files
+>${_WKGDIR}/last-check
+>${_WKGDIR}/log-news
+>${_WKGDIR}/connected-users
+_LOGTHIS INFO "Backup Map files: ${_SAVEBKPDIR}/Enshrouded_Map-$(date +%d%m%Y-%H%M).zip"
 zip -r ${_SAVEBKPDIR}/Enshrouded-map_$(date +%d%m%Y-%H%M).zip  ${_GAMEDIR}/savegame/*
 # Make update only if steam game repo have been updated within last 24h (as this script is meant to run every day)
 if [ "$(date  -d "$_LASTGAMEUPDATE" +'%s')" -ge "$(date  +'%s' --date="-1 day")" ]; then
