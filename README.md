@@ -14,7 +14,7 @@ Client-Side:
 <br />
 <br />
 
-### enshrd_query + steamquery.py
+### `enshrd_query` + `steamquery.py`
 
 - [x] Show Server_Query infos (cf. https://developer.valvesoftware.com/wiki/Server_Queries)
 - [x] Show Currently connected Username ("SteamID to Usename" uses https://steamid.io or Steam directly if API Key is provided)
@@ -30,7 +30,7 @@ _screenshot:_
 <br />
 <br />
 
-### enshrd_steamuser_check
+### `enshrd_steamuser_check`
 
 - [x] Monitor enshroudedserver.log for [successfull/failed] connection attempts
 - [x] maintain a list of currently logged in Usernames
@@ -60,7 +60,7 @@ $cat ~/enshrd-monitor/user-connection.log
 <br />
 <br />
 
-### enshrd_backupgrade
+### `enshrd_backupgrade`
 
 - [x] Auto backup Map files (server 'savegame' folder)
 - [x] Auto Update Game Server Files with SteamCMD if Steam Game Repository show a new update
@@ -89,6 +89,12 @@ $cat ~/enshrd-monitor/update.log
 [2024-04-15 04:07:08] [INFO] Restarting service: enshrd.service
 [2024-04-15 04:07:08] [END] Enshrouded Server [Version:511168] - Backup/Update Complete!
 ```
+<br />
+<br />
+
+### `proton-update` [Option within `enshrd_backupgrade`]
+- [x] Transparently Update Proton Installation if new latest version on repository (cf. https://github.com/GloriousEggroll/proton-ge-custom/releases) 
+
 <br />
 <br />
 
