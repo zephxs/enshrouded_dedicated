@@ -87,7 +87,10 @@ else
 fi
 # Proton Update if set
 if [ "$_PROTON_UPDATE" = "true" ]; then
-  type proton-update >/dev/null 2>&1 && proton-update || _LOGTHIS FAIL "Proton Update script not found"
+  if type proton-update >/dev/null 2>&1; then
+    proton-update || _LOGTHIS WARN "Tried to reinstall previous Proton version"
+    else
+    _LOGTHIS FAIL "Proton Update script not found"
 fi
 _LOGTHIS INFO "Restarting service: $_SERVICEFILE"
 sudo systemctl start $_SERVICEFILE
