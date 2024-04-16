@@ -70,8 +70,8 @@ _LOGTHIS INFO "Stopping service: $_SERVICEFILE"
 sudo systemctl stop $_SERVICEFILE
 sleep 5
 # Clean monitoring files
->${_WKGDIR}/last-check
->${_WKGDIR}/log-news
+>${_WKGDIR}/last_check
+>${_WKGDIR}/log_news
 >${_WKGDIR}/connected-users
 _LOGTHIS INFO "Backup Map files: ${_SAVEBKPDIR}/Enshrouded_Map-$(date +%d%m%Y-%H%M).zip"
 zip -r ${_SAVEBKPDIR}/Enshrouded-map_$(date +%d%m%Y-%H%M).zip  ${_GAMEDIR}/savegame/*
