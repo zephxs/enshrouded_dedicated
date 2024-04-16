@@ -35,6 +35,7 @@ local _TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 printf "[${_TIMESTAMP}] [${_LEVEL}] ${_MESSAGE}\n" >>$_LOG_FILE
 }
 
+# Checks
 [ -d "$_WKGDIR" ] || mkdir -p ${_WKGDIR}
 [ -f "$_ENSHRD_LOGFILE" ] || { _LOGTHIS FAIL "Enshrouded Server Logfile not found.."; exit 1; }
 [ -f "${_WKGDIR}/last_check" ] || touch "${_WKGDIR}/last_check"

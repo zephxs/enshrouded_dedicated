@@ -7,14 +7,16 @@
 # crontab @4AM every day
 # 0 4 * * * /usr/local/bin/enshrd_backupgrade 
 
-_USERDIR="/home/enshrouded"
-_STEAMCMD="${_USERDIR}/steamcmd/steamcmd.sh"
-_WKGDIR="${_USERDIR}/enshrd-monitor"
-_SAVEBKPDIR="${_USERDIR}/enshrd-bak"
-_GAMEDIR="${_USERDIR}/enshroudedserver"
-_LOGFILE="${_WKGDIR}/update.log"
-_LOCKFILE="/tmp/.enshrd_updater.lock"
-_SERVICEFILE="enshrd.service"
+_USERDIR="/home/enshrouded"                        # Enshrouded User directory
+_STEAMCMD="${_USERDIR}/steamcmd/steamcmd.sh"       # SteamCMD script location
+_WKGDIR="${_USERDIR}/enshrd-monitor"               # Monitoring Directory used by this toolset
+_SAVEBKPDIR="${_USERDIR}/enshrd-bak"               # Backup Folder for Savegames
+_GAMEDIR="${_USERDIR}/enshroudedserver"            # Enshrouded Server Game Directory
+_LOGFILE="${_WKGDIR}/update.log"                   # Log file for this script
+_LOCKFILE="/tmp/.enshrd_updater.lock"              # lockfile location
+_SERVICEFILE="enshrd.service"                      # Enshrouded Service name
+# Optional Proton Update with "proton-update" script
+_PROTON_UPDATE=""                                  # Set to 'true" if Proton is used
 
 ### PRE
 _LOGTHIS(){
@@ -41,16 +43,17 @@ fi
 echo $$ >$_LOCKFILE
 trap 'rm -f "$_LOCKFILE"' EXIT
 
-# check script
-type enshrd_query >/dev/null || { echo -e "[$(date '+%d-%m-%Y %H:%M:%S')] Script 'enshrd_query' not found in PATH.. exit" >>$_LOGFILE; exit 1; }
+# check query script presence
+type enshrd_query >/dev/null || { _LOGTHIS FAIL "Script 'enshrd_query' not found in PATH"; exit 1; }
 
-
+# SteamCMD update function
 _ENSHRDUPDATE(){
 _LOGTHIS INFO "SteamCMD Update Starting"
 $_STEAMCMD +@sSteamCmdForcePlatformType windows +force_install_dir $_GAMEDIR +login anonymous +app_update 2278520 +quit >> ${_WKGDIR}/steamcmd-last-update.txt
 _LOGTHIS INFO "SteamCMD Update Finished!"
 }
 
+# Base Informations collect
 _LASTGAMEUPDATE=$(date -d @$(curl -s https://api.steamcmd.net/v1/info/2278520 | jq '.data."2278520".depots.branches.public.timeupdated' |tr -d '"'))
 _CURRENTVERSION=$(grep SVN ${_GAMEDIR}/logs/enshrouded_server.log | awk '{print $NF}')
 
@@ -69,10 +72,11 @@ fi
 _LOGTHIS INFO "Stopping service: $_SERVICEFILE"
 sudo systemctl stop $_SERVICEFILE
 sleep 5
-# Clean monitoring files
+# Clean logs and monitoring files
 >${_WKGDIR}/last_check
 >${_WKGDIR}/log_news
 >${_WKGDIR}/connected-users
+>${_GAMEDIR}/logs/enshrouded_server.log
 _LOGTHIS INFO "Backup Map files: ${_SAVEBKPDIR}/Enshrouded_Map-$(date +%d%m%Y-%H%M).zip"
 zip -r ${_SAVEBKPDIR}/Enshrouded-map_$(date +%d%m%Y-%H%M).zip  ${_GAMEDIR}/savegame/*
 # Make update only if steam game repo have been updated within last 24h (as this script is meant to run every day)
@@ -80,6 +84,10 @@ if [ "$(date  -d "$_LASTGAMEUPDATE" +'%s')" -ge "$(date  +'%s' --date="-1 day")"
   _ENSHRDUPDATE
 else
   _LOGTHIS INFO "Steam Repo Check: Update not needed"
+fi
+# Proton Update if set
+if [ "$_PROTON_UPDATE" = "true" ]; then
+  type proton-update >/dev/null 2>&1 && proton-update || _LOGTHIS FAIL "Proton Update script not found"
 fi
 _LOGTHIS INFO "Restarting service: $_SERVICEFILE"
 sudo systemctl start $_SERVICEFILE

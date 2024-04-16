@@ -1,0 +1,59 @@
+#!/bin/bash
+##### Update Proton install and link to : "/home/enshrouded/.steam/root/compatibilitytools.d/Proton-latest"
+# v0.1 - POC
+
+# VARS
+_USERDIR="/home/enshrouded"
+_WKGDIR="${_USERDIR}/enshrd-monitor"
+_LOGFILE="${_WKGDIR}/update.log"
+_SERVICEFILE="enshrd.service"
+_TMPDLFOLDER="${_USERDIR}/tmpdl"
+_PROTONLATEST=$(curl -s https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest |awk '/tag_name/ {print $2}' |tr -d '"|,')
+_PROTONCURVERSION=$(realpath /home/enshrouded/.steam/root/compatibilitytools.d/Proton-latest |awk -F'/' '{print $NF}')
+_INSTALLOC="/home/enshrouded/.steam/root/compatibilitytools.d"
+
+### PRE
+_LOGTHIS(){
+local _LEVEL="$1"
+local _MESSAGE="$2"
+local _TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
+printf "[${_TIMESTAMP}] [${_LEVEL}] ${_MESSAGE}\n" >>$_LOGFILE
+}
+
+# Start update if Current version does not match repository latest version
+if [ "${_PROTONLATEST}" = "${_PROTONCURVERSION}" ]; then
+  _LOGTHIS INFO "Proton does not need to be upgraded"	
+  exit 0
+else
+  _LOGTHIS INFO "Proton Current Version: $_PROTONCURVERSION"
+  _LOGTHIS INFO "Upgrading to Proton Latest: $_PROTONLATEST"
+fi
+
+# stop service in case script is started lonely
+if [ "$(sudo systemctl is-active enshrd.service)" = "active" ]; then
+# stop service and backup map
+_LOGTHIS INFO "Stopping service: $_SERVICEFILE"
+sudo systemctl stop $_SERVICEFILE
+sleep 5
+# Clean monitoring files
+>${_WKGDIR}/last_check
+>${_WKGDIR}/log_news
+>${_WKGDIR}/connected-users
+>${_USERDIR}/enshroudedserver/logs/enshrouded_server.log
+fi
+
+### MAIN
+[ -d "$_TMPDLFOLDER" ] || mkdir $_TMPDLFOLDER
+unlink ${_INSTALLOC}/Proton-latest
+cd $_TMPDLFOLDER
+curl -sLOJ "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/${_PROTONLATEST}/${_PROTONLATEST}.tar.gz" 
+tar -xzf GE-Proton*.tar.gz -C ${_INSTALLOC}/
+rm -rf ${_TMPDLFOLDER}/*
+cd $_INSTALLOC
+mv ${_PROTONLATEST}/user_settings.sample.py ${_PROTONLATEST}/user_settings.py
+ln -s ${_INSTALLOC}/${_PROTONLATEST} ${_INSTALLOC}/Proton-latest
+if [ -x "${_INSTALLOC}/Proton-latest/proton" ]; then
+  _LOGTHIS INFO "${_PROTONLATEST} was Installed Successfully"
+else
+  _LOGTHIS WARN "${_PROTONLATEST} was NOT Installed correctly"
+fi
