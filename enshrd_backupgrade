@@ -48,7 +48,7 @@ type enshrd_query >/dev/null || { _LOGTHIS FAIL "Script 'enshrd_query' not found
 
 # SteamCMD update function
 _ENSHRDUPDATE(){
-_LOGTHIS INFO "Starting SteamCMD Update"
+_LOGTHIS INFO "Starting SteamCMD Game Update"
 $_STEAMCMD +@sSteamCmdForcePlatformType windows +force_install_dir $_GAMEDIR +login anonymous +app_update 2278520 +quit > ${_WKGDIR}/steamcmd-last-update.txt && \
 _LOGTHIS SUCCESS "SteamCMD Update Success! [log: ${_WKGDIR}/steamcmd-last-update.txt]" || \
 _LOGTHIS FAIL "SteamCMD Update Failed [log: ${_WKGDIR}/steamcmd-last-update.txt]"
