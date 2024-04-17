@@ -89,11 +89,11 @@ _EXITR
 fi
 # If New Client login detected parse new logs
 if grep '\[online\] Client' ${_WKGDIR}/log_news | grep -q 'authenticated by steam'; then
+  # wait a bit for if the connection just occurs
+  sleep 10 && _GET_LOGDIFF
   # Get New Player Handler or exit
   _NEWUSERIDS=($(awk '/Remote player added. Player handle/ {print $NF}' ${_WKGDIR}/log_news))
   [ -z "${_NEWUSERIDS[*]}" ] && _EXITR || _LOGTHIS INFO "New ID(s) detected = ${_NEWUSERIDS[@]}"
-  # sleep 5 sec if the connection just occurs
-  sleep 5 && _GET_LOGDIFF
   for _NEWHANDLER in "${_NEWUSERIDS[@]}"; do
     # If Auth fail
     if grep -A15 ${_NEWHANDLER} ${_WKGDIR}/log_news | grep -q "Remove player from session. Not found in online game info." ; then
@@ -101,11 +101,9 @@ if grep '\[online\] Client' ${_WKGDIR}/log_news | grep -q 'authenticated by stea
       _LOGTHIS WARN "Failed connection attempt = $_STEAMUSER"
       [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "Enshrouded Server
 # FAILED User Auth = $_STEAMUSER"
-
     # else search username
     else
       _EXTERNAL_ID
-      # log to file and send telegram alert
       _LOGTHIS INFO "User Connected = $_STEAMUSER $_NEWHANDLER"
       [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "Enshrouded Server
 # User Connected = $_STEAMUSER"
