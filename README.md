@@ -6,11 +6,11 @@ Simple Shell script-set to "Monitor / Backup / Update" Enshrouded dedicated serv
 Server-Side: 
 - `All the scripts` work together to collect realtime informations (every minutes), and once a day backup the server map and upgrade server core files if needed (with SteamCMD). 
 - They all need to be placed in the PATH of the "enshrouded user" that runs the server binary (enshrouded_server.exe). 
-- The "enshourded user" MUST have "sudo NOPASSWD" properly configured for managing the Enshrouded Systemd Service during the Backup / Upgrade process (see "Sample Sudoer" at the end of this doc).
+- The *"Enshourded User"* MUST have *"sudo"* properly configured for managing the Enshrouded Systemd Service during the Backup / Upgrade process (see "Sample Sudoer" at the end of this doc).
 
 
 Client-Side: 
-- `enshrd_query` + `steamquery.py` scripts are used to get Enshrouded Server status, base informations, SVN version, and Username(s) that are currently logged in to the server.
+- `enshrd_query` + `steamquery.py` scripts are used to get Enshrouded Server status, base informations, Enshrouded SVN Server version, and Steam Username(s) that are currently logged in to the server.
 
 <br />
 <br />
@@ -54,9 +54,9 @@ _screenshot:_
 ### `enshrd_steamuser_check`
 
 - [x] Monitor enshroudedserver.log for [successfull/failed] connection attempts
-- [x] Convert Steam ID to Steam Username (uses Steam directly if API Key is provided or https://steamid.io)
+- [x] Convert Steam ID to Steam Username (uses 'Steam Api' if `_APIKEY='XXXXXX'` is provided or 'https://steamid.io')
 - [x] Keep a fresh list of currently logged in Users
-- [x] Optional - send custom message to telegram channel on User Login/Logout
+- [x] Optional [`_TELEGRAM_ALERT="true"`] - send custom message to telegram channel on User Login/Logout
 
 > [!TIP]
 > Crontab every minute :
@@ -85,8 +85,8 @@ $cat ~/enshrd-monitor/user-connection.log
 ### `enshrd_backupgrade`
 
 - [x] Auto backup Map files (server 'savegame' folder)
-- [x] Auto Update Game Server Files with SteamCMD if Steam Game Repository show a new update
-- [x] Optional - Auto Update Proton binary with `proton-update` (see below)
+- [x] Auto Update Game Server Files with `SteamCMD` if Steam Game Repository have a new update
+- [x] Optional [`_PROTON_UPDATE="true"`] - Auto Update Proton binary with `proton-update` script
 
 > [!NOTE]
 > requires: `enshrd_query` to block process if users are connected to the instance
@@ -117,7 +117,7 @@ $cat ~/enshrd-monitor/update.log
 
 ### `proton-update` [Option within `enshrd_backupgrade`]
 - [x] Transparently Update Proton Installation if new latest version is availaible on Github "GloriousEggroll" Repository (cf. https://github.com/GloriousEggroll/proton-ge-custom/releases)
-- [x] Defined install directory: <Enshrouded User Homedir>/.steam/root/compatibilitytools.d/Proton-latest
+- [x] Defined install directory: _\<Enshrouded User Homedir\>/.steam/root/compatibilitytools.d/Proton-latest_
 - [x] Automatic Symlink / test new install / and revert back in case of error
 
 ```
