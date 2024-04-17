@@ -62,11 +62,11 @@ _LOGTHIS START "Enshrouded server Backup / Update started"
 _LOGTHIS INFO "Current version: $_CURRENTVERSION"
 _LOGTHIS INFO "Steam Game Repo last update: $_LASTGAMEUPDATE"
 # Abort if player are connected
-if [ "$(enshrd_query -l -n)" -ne 0 ]; then
+if [ "$(enshrd_query -l -n)" = "0" -o "$(enshrd_query -n -l)" = "" ]; then
+  _LOGTHIS INFO "Active User(s) detected: '0'"
+else
   _LOGTHIS WARN "Active User(s) detected: $(cat ${_WKGDIR}/connected-users), abort.."
   exit 1 
-else
-  _LOGTHIS INFO "Active User(s) detected: '0'"
 fi
 # stop service and backup map
 _LOGTHIS INFO "Stopping service: $_SERVICEFILE"
@@ -89,8 +89,9 @@ fi
 if [ "$_PROTON_UPDATE" = "true" ]; then
   if type proton-update >/dev/null 2>&1; then
     proton-update || { _LOGTHIS FAIL "Proton test failed, server blocked" && exit 1; }
-    else
+  else
     _LOGTHIS WARN "Proton Update script not found.. skip"
+  fi
 fi
 _LOGTHIS INFO "Restarting service: $_SERVICEFILE"
 sudo systemctl start $_SERVICEFILE

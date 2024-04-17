@@ -22,7 +22,7 @@ printf "[${_TIMESTAMP}] [${_LEVEL}] ${_MESSAGE}\n" >>$_LOGFILE
 
 # Start update if Current version does not match repository latest version
 if [ "${_PROTONLATEST}" = "${_PROTONCURVERSION}" ]; then
-  _LOGTHIS INFO "Proton does not need to be upgraded"	
+  _LOGTHIS INFO "Proton Repo Check: Update not needed"	
   exit 0
 else
   _LOGTHIS INFO "Proton Current Version: $_PROTONCURVERSION"
