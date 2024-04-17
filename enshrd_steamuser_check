@@ -95,13 +95,22 @@ if grep '\[online\] Client' ${_WKGDIR}/log_news | grep -q 'authenticated by stea
   _NEWUSERIDS=($(awk '/Remote player added. Player handle/ {print $NF}' ${_WKGDIR}/log_news))
   [ -z "${_NEWUSERIDS[*]}" ] && _EXITR || _LOGTHIS INFO "New ID(s) detected = ${_NEWUSERIDS[@]}"
   for _NEWHANDLER in "${_NEWUSERIDS[@]}"; do
-    # If Auth fail
-    if grep -A15 ${_NEWHANDLER} ${_WKGDIR}/log_news | grep -q "Remove player from session. Not found in online game info." ; then
+    # If User login and out in the same minute !
+    if grep -q 'Remove Entity for Player' ${_WKGDIR}/log_news; then
+      _REMOVEDPLAYER=($(awk '/Remove Entity for Player/ {print $NF}' ${_WKGDIR}/log_news |tr -d "'"))
+      for _REMOVEDUSER in ${_REMOVEDPLAYER[@]}; do
+        _LOGTHIS INFO "User Login and Logout = $_REMOVEDPLAYER"
+        grep -q "$_REMOVEDUSER" $_CONNECTED_USERS && sed -i "/$_REMOVEDUSER/d" $_CONNECTED_USERS
+      done
+      [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "Enshrouded Server
+# User Login and Logout = ${_REMOVEDPLAYER[@]}"
+    # If User Auth fail
+    elif grep -A15 ${_NEWHANDLER} ${_WKGDIR}/log_news | grep -q "Remove player from session. Not found in online game info." ; then
       _EXTERNAL_ID  
       _LOGTHIS WARN "Failed connection attempt = $_STEAMUSER"
       [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "Enshrouded Server
 # FAILED User Auth = $_STEAMUSER"
-    # else search username
+    # else considered successfull login
     else
       _EXTERNAL_ID
       _LOGTHIS INFO "User Connected = $_STEAMUSER $_NEWHANDLER"
@@ -112,7 +121,7 @@ if grep '\[online\] Client' ${_WKGDIR}/log_news | grep -q 'authenticated by stea
   done
 fi
 
-# if not try to find removed player
+# Now try to find removed player
 if grep -q 'Remove Entity for Player' ${_WKGDIR}/log_news; then
   _REMOVEDPLAYER=($(awk '/Remove Entity for Player/ {print $NF}' ${_WKGDIR}/log_news |tr -d "'"))
   for _REMOVEDUSER in ${_REMOVEDPLAYER[@]}; do
