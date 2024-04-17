@@ -77,9 +77,10 @@ sleep 5
 >${_WKGDIR}/log_news
 >${_WKGDIR}/connected-users
 >${_GAMEDIR}/logs/enshrouded_server.log
+# Backup Savegame folder
 _LOGTHIS INFO "Backup Map files: ${_SAVEBKPDIR}/Enshrouded_Map-$(date +%d%m%Y-%H%M).zip"
-zip -r ${_SAVEBKPDIR}/Enshrouded-map_$(date +%d%m%Y-%H%M).zip  ${_GAMEDIR}/savegame/*
-# Make update only if steam game repo have been updated within last 24h (as this script is meant to run every day)
+zip -q -r ${_SAVEBKPDIR}/Enshrouded-map_$(date +%d%m%Y-%H%M).zip  ${_GAMEDIR}/savegame/*
+# Update Core Game files only if steam game repo have been updated within last 24h (as this script is meant to run every day)
 if [ "$(date  -d "$_LASTGAMEUPDATE" +'%s')" -ge "$(date  +'%s' --date="-1 day")" ]; then
   _ENSHRDUPDATE
 else
@@ -88,14 +89,14 @@ fi
 # Proton Update if set
 if [ "$_PROTON_UPDATE" = "true" ]; then
   if type proton-update >/dev/null 2>&1; then
-    proton-update || { _LOGTHIS FAIL "Proton test failed, server blocked" && exit 1; }
+    proton-update || { _LOGTHIS FAIL "Proton check failed, Server inconsistency.." && exit 1; }
   else
-    _LOGTHIS WARN "Proton Update script not found.. skip"
+    _LOGTHIS WARN "Script 'proton-update' not found: skip"
   fi
 fi
+# wait for server start
 _LOGTHIS INFO "Restarting service: $_SERVICEFILE"
 sudo systemctl start $_SERVICEFILE
-# wait for server start
 counter="0"
 while ! grep -q SVN ${_GAMEDIR}/logs/enshrouded_server.log; do
 	sleep 3
