@@ -17,8 +17,9 @@ Client-Side:
 
 ### `enshrd_query` + `steamquery.py`
 
-- [x] Show Server_Query infos (cf. https://developer.valvesoftware.com/wiki/Server_Queries) via 'steamquery.py <server> <port>' (can be used alone)
-- [x] Show Currently connected Username ("SteamID to Usename" uses https://steamid.io or Steam directly if API Key is provided)
+- [x] Show Server_Query informations: `steamquery.py <server> <port>` can be used separately without any private access to the server (cf. https://developer.valvesoftware.com/wiki/Server_Queries)
+- [x] Display Currently connected Steam Usernames
+- [x] Display Enshrouded Server Version
 
 ```
 enshrd_query -h
@@ -53,7 +54,8 @@ _screenshot:_
 ### `enshrd_steamuser_check`
 
 - [x] Monitor enshroudedserver.log for [successfull/failed] connection attempts
-- [x] maintain a list of currently logged in Usernames
+- [x] Convert Steam ID to Steam Username (uses Steam directly if API Key is provided or https://steamid.io)
+- [x] Keep a fresh list of currently logged in Users
 - [x] Optional - send custom message to telegram channel on User Login/Logout
 
 > [!TIP]
@@ -84,9 +86,10 @@ $cat ~/enshrd-monitor/user-connection.log
 
 - [x] Auto backup Map files (server 'savegame' folder)
 - [x] Auto Update Game Server Files with SteamCMD if Steam Game Repository show a new update
+- [x] Optional - Auto Update Proton binary with `proton-update` (see below)
 
 > [!NOTE]
-> requires: `enshrd_query` to block process if users are connected
+> requires: `enshrd_query` to block process if users are connected to the instance
 
 > [!TIP]
 > Crontab every day @4h30 AM :
@@ -113,7 +116,18 @@ $cat ~/enshrd-monitor/update.log
 <br />
 
 ### `proton-update` [Option within `enshrd_backupgrade`]
-- [x] Transparently Update Proton Installation if new latest version on repository (cf. https://github.com/GloriousEggroll/proton-ge-custom/releases) 
+- [x] Transparently Update Proton Installation if new latest version is availaible on Github "GloriousEggroll" Repository (cf. https://github.com/GloriousEggroll/proton-ge-custom/releases)
+- [x] Defined install directory: <Enshrouded User Homedir>/.steam/root/compatibilitytools.d/Proton-latest
+- [x] Automatic Symlink / test new install / and revert back in case of error
+
+```
+ls -lah $HOME/.steam/root/compatibilitytools.d/
+total 16K
+drwxrwxr-x  3 enshrouded enshrouded 4.0K Apr 16 13:28 .
+drwx------ 25 enshrouded enshrouded 4.0K Apr 12 21:42 ..
+drwxr-xr-x  5 enshrouded enshrouded 4.0K Apr 16 13:21 GE-Proton9-4
+lrwxrwxrwx  1 enshrouded enshrouded   62 Apr 16 13:02 Proton-latest -> /home/enshrouded/.steam/root/compatibilitytools.d/GE-Proton9-4
+```
 
 <br />
 <br />
