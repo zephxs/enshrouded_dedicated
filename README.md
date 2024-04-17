@@ -5,7 +5,8 @@ Simple Shell script-set to "Monitor / Backup / Update" Enshrouded dedicated serv
 
 Server-Side: 
 - `All the scripts` work together to collect realtime informations (every minutes), and once a day backup the server map and upgrade server core files if needed (with SteamCMD). 
-- They all need to be placed in the PATH of the "enshrouded user" that runs the server binary (enshrouded_server.exe).
+- They all need to be placed in the PATH of the "enshrouded user" that runs the server binary (enshrouded_server.exe). 
+- The "enshourded user" MUST have "sudo NOPASSWD" properly configured for managing the Enshrouded Systemd Service during the Backup / Upgrade process (see "Sample Sudoer" at the end of this doc).
 
 
 Client-Side: 
@@ -16,8 +17,27 @@ Client-Side:
 
 ### `enshrd_query` + `steamquery.py`
 
-- [x] Show Server_Query infos (cf. https://developer.valvesoftware.com/wiki/Server_Queries)
+- [x] Show Server_Query infos (cf. https://developer.valvesoftware.com/wiki/Server_Queries) via 'steamquery.py <server> <port>' (can be used alone)
 - [x] Show Currently connected Username ("SteamID to Usename" uses https://steamid.io or Steam directly if API Key is provided)
+
+```
+enshrd_query -h
+
+Server infos:
+  -s|--server <Ip-Hostname>
+  -p|--port   <query_port>
+
+  exemple: "enshrd_query <server>:<port>"
+  or: "enshrd_query -s <server> -p <port>"
+  *** Server infos can be set in script variable to avoid input
+
+Modes:
+  [default] No Argument                  # Query All Steam Server Infos
+  -u|--user                              # Query currently connected user(s)
+  -n|--number                            # Output only the number [0-9] of connected users (used locally for server restart/update)
+  -l|--local                             # Used for server-side local run
+```
+
 
 > [!NOTE]
 > requires: python3 `pip` for SteamQuery lib install and use, `ssh access` to the server (preferably with a running agent), 
@@ -102,7 +122,7 @@ $cat ~/enshrd-monitor/update.log
 
 <br />
 
-_cat /etc/systemd/system/enshrd.service_
+_Sample Proton Service: /etc/systemd/system/enshrd.service_
 ```
 cat /etc/systemd/system/enshrd.service
 [Unit]
@@ -123,7 +143,25 @@ WantedBy=multi-user.target
 
 <br />
 
-_visudo /etc/sudoers.d/enshrouded-user_
+_Sample Wine Service: /etc/systemd/system/enshrd.service_
+```
+[Unit]
+Description=Enshrouded Server
+Wants=network-online.target
+After=network-online.target
+[Service]
+User=enshrouded
+Group=enshrouded
+WorkingDirectory=/home/enshrouded/
+ExecStart=/usr/local/bin/wine64 /home/enshrouded/enshroudedserver/enshrouded_server.exe
+Restart=always
+[Install]
+WantedBy=multi-user.target
+```
+
+<br />
+
+_Sample Sudoer file: visudo /etc/sudoers.d/enshrouded-user_
 ```
 enshrouded ALL=(ALL) NOPASSWD:/usr/bin/systemctl start enshrd.service,/usr/bin/systemctl stop enshrd.service,/usr/bin/systemctl restart enshrd.service,/usr/bin/systemctl is-active enshrd.service
 ```
