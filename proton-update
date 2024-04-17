@@ -53,13 +53,13 @@ cd $_INSTALLOC
 mv ${_PROTONLATEST}/user_settings.sample.py ${_PROTONLATEST}/user_settings.py
 ln -s ${_INSTALLOC}/${_PROTONLATEST} ${_INSTALLOC}/Proton-latest
 if [ -x "${_INSTALLOC}/Proton-latest/proton" ]; then
-  _LOGTHIS INFO "${_PROTONLATEST} was Installed Successfully"
+  _LOGTHIS SUCCESS "${_PROTONLATEST} was Installed Successfully"
 else
-  _LOGTHIS WARN "${_PROTONLATEST} was NOT Installed correctly"
+  _LOGTHIS FAIL "${_PROTONLATEST} was NOT Installed correctly.."
   unlink ${_INSTALLOC}/Proton-latest
   ln -s ${_INSTALLOC}/${_PROTONCURVERSION} ${_INSTALLOC}/Proton-latest
   if [ -x "${_INSTALLOC}/Proton-latest/proton" ]; then
-  _LOGTHIS INFO "${_PROTONCURVERSION} has been reinstalled"
+  _LOGTHIS WARN "${_PROTONCURVERSION} has been reinstalled"
   exit 0
 else
   exit 1

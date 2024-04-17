@@ -48,9 +48,10 @@ type enshrd_query >/dev/null || { _LOGTHIS FAIL "Script 'enshrd_query' not found
 
 # SteamCMD update function
 _ENSHRDUPDATE(){
-_LOGTHIS INFO "SteamCMD Update Starting"
-$_STEAMCMD +@sSteamCmdForcePlatformType windows +force_install_dir $_GAMEDIR +login anonymous +app_update 2278520 +quit >> ${_WKGDIR}/steamcmd-last-update.txt
-_LOGTHIS INFO "SteamCMD Update Finished!"
+_LOGTHIS INFO "Starting SteamCMD Update"
+$_STEAMCMD +@sSteamCmdForcePlatformType windows +force_install_dir $_GAMEDIR +login anonymous +app_update 2278520 +quit > ${_WKGDIR}/steamcmd-last-update.txt && \
+_LOGTHIS SUCCESS "SteamCMD Update Success! [log: ${_WKGDIR}/steamcmd-last-update.txt]" || \
+_LOGTHIS FAIL "SteamCMD Update Failed [log: ${_WKGDIR}/steamcmd-last-update.txt]"
 }
 
 # Base Informations collect
@@ -91,7 +92,7 @@ if [ "$_PROTON_UPDATE" = "true" ]; then
   if type proton-update >/dev/null 2>&1; then
     proton-update || { _LOGTHIS FAIL "Proton check failed, Server inconsistency.." && exit 1; }
   else
-    _LOGTHIS WARN "Script 'proton-update' not found: skip"
+    _LOGTHIS WARN "Script 'proton-update' not found: skip.."
   fi
 fi
 # wait for server start
@@ -101,7 +102,7 @@ counter="0"
 while ! grep -q SVN ${_GAMEDIR}/logs/enshrouded_server.log; do
 	sleep 3
 	counter=$((counter+1))
-	[ "$counter" = 20 ] && _LOGTHIS FAIL "Service did not restart properly" && exit 1
+	[ "$counter" = 20 ] && _LOGTHIS END_FAIL "Service did not restart properly" && exit 1
 done
-_LOGTHIS END "Enshrouded Server [Version:$(grep SVN ${_GAMEDIR}/logs/enshrouded_server.log | awk '{print $NF}')] - Backup/Update Complete! "
+_LOGTHIS END_SUCCESS "Enshrouded Server [Version:$(grep SVN ${_GAMEDIR}/logs/enshrouded_server.log | awk '{print $NF}')] - Backup/Update Complete! "
 

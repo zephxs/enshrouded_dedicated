@@ -92,7 +92,7 @@ $cat ~/enshrd-monitor/user-connection.log
 > requires: `enshrd_query` to block process if users are connected to the instance
 
 > [!TIP]
-> Crontab every day @4h30 AM :
+> Crontab every day for ex. @4:30 AM :
 > ```
 > 30 4 * * * /usr/local/sbin/enshrd_backupgrade
 > ```
@@ -102,16 +102,19 @@ $cat ~/enshrd-monitor/user-connection.log
 _Sample logs:_
 ```
 $cat ~/enshrd-monitor/update.log
-[2024-04-15 04:05:32] [START] Enshrouded server Backup / Update started
-[2024-04-15 04:05:32] [INFO] Current version: 511168
-[2024-04-15 04:05:32] [INFO] Steam Game Repo last update: Thu Mar 28 10:35:39 UTC 2024
-[2024-04-15 04:05:32] [INFO] Active User(s) detected: '0'
-[2024-04-15 04:05:32] [INFO] Stopping service: enshrd.service
-[2024-04-15 04:07:08] [INFO] Backuping Map files: /home/enshrouded/enshrd-bak/Enshrouded_Map-15042024-0407.zip
-[2024-04-15 04:07:08] [INFO] Steam Repo Check: Update not needed
-[2024-04-15 04:07:08] [INFO] Restarting service: enshrd.service
-[2024-04-15 04:07:08] [END] Enshrouded Server [Version:511168] - Backup/Update Complete!
+[2024-04-17 13:25:07] [START] Enshrouded server Backup / Update started
+[2024-04-17 13:25:07] [INFO] Current version: 511168
+[2024-04-17 13:25:07] [INFO] Steam Game Repo last update: Wed Apr 17 08:26:12 UTC 2024
+[2024-04-17 13:25:08] [INFO] Active User(s) detected: '0'
+[2024-04-17 13:25:08] [INFO] Stopping service: enshrd.service
+[2024-04-17 13:26:43] [INFO] Backup Map files: /home/enshrouded/enshrd-bak/Enshrouded_Map-17042024-1326.zip
+[2024-04-17 13:26:44] [INFO] SteamCMD Update Starting
+[2024-04-17 13:27:41] [INFO] SteamCMD Update Finished!
+[2024-04-17 13:27:41] [INFO] Proton Repo Check: Update not needed
+[2024-04-17 13:27:41] [INFO] Restarting service: enshrd.service
+[2024-04-17 13:28:06] [END] Enshrouded Server [Version:516139] - Backup/Update Complete!
 ```
+
 <br />
 <br />
 
@@ -136,7 +139,7 @@ lrwxrwxrwx  1 enshrouded enshrouded   62 Apr 16 13:02 Proton-latest -> /home/ens
 
 <br />
 
-_Sample Proton Service: /etc/systemd/system/enshrd.service_
+Sample Proton Service: _/etc/systemd/system/enshrd.service_
 ```
 cat /etc/systemd/system/enshrd.service
 [Unit]
@@ -157,7 +160,7 @@ WantedBy=multi-user.target
 
 <br />
 
-_Sample Wine Service: /etc/systemd/system/enshrd.service_
+Sample Wine Service: _/etc/systemd/system/enshrd.service_
 ```
 [Unit]
 Description=Enshrouded Server
@@ -175,7 +178,7 @@ WantedBy=multi-user.target
 
 <br />
 
-_Sample Sudoer file: visudo /etc/sudoers.d/enshrouded-user_
+Sample _Sudoer file_: visudo /etc/sudoers.d/enshrouded-user
 ```
 enshrouded ALL=(ALL) NOPASSWD:/usr/bin/systemctl start enshrd.service,/usr/bin/systemctl stop enshrd.service,/usr/bin/systemctl restart enshrd.service,/usr/bin/systemctl is-active enshrd.service
 ```
