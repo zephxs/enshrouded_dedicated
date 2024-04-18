@@ -126,9 +126,9 @@ $cat ~/enshrd-monitor/update.log
 ```
 ls -lah $HOME/.steam/root/compatibilitytools.d/
 
-drwxr-xr-x 4 zefadm zefadm 4.0K Apr 15 18:58 GE-Proton9-3
-drwxr-xr-x 4 zefadm zefadm 4.0K Apr 18 11:30 GE-Proton9-4
-lrwxrwxrwx 1 zefadm zefadm   58 Apr 18 11:30 Proton-latest -> /home/zefadm/.steam/root/compatibilitytools.d/GE-Proton9-4
+drwxr-xr-x 4 enshrouded enshrouded 4.0K Apr 15 18:58 GE-Proton9-3
+drwxr-xr-x 4 enshrouded enshrouded 4.0K Apr 18 11:30 GE-Proton9-4
+lrwxrwxrwx 1 enshrouded enshrouded   58 Apr 18 11:30 Proton-latest -> /home/enshrouded/.steam/root/compatibilitytools.d/GE-Proton9-4
 ```
 
 <br />
