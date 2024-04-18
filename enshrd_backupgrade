@@ -51,7 +51,7 @@ _ENSHRDUPDATE(){
 _LOGTHIS INFO "Starting SteamCMD Game Update"
 _LOGTHIS INFO "SteamCMD Log: ${_WKGDIR}/steamcmd-last-update.log"
 $_STEAMCMD +@sSteamCmdForcePlatformType windows +force_install_dir $_GAMEDIR +login anonymous +app_update 2278520 +quit > ${_WKGDIR}/steamcmd-last-update.log && \
-_LOGTHIS INFO "SteamCMD Update Success!" || \
+_LOGTHIS SUCCESS "SteamCMD Update Success!" || \
 _LOGTHIS FAIL "SteamCMD Update Failed.."
 }
 
@@ -62,7 +62,7 @@ _CURRENTVERSION=$(grep SVN ${_GAMEDIR}/logs/enshrouded_server.log | awk '{print 
 # Main
 _LOGTHIS START "Enshrouded server Backup / Update started"
 _LOGTHIS INFO "Current version: $_CURRENTVERSION"
-_LOGTHIS INFO "Steam Game Repo last update: $_LASTGAMEUPDATE"
+
 # Abort if player are connected
 if [ "$(enshrd_query -l -n)" = "0" -o "$(enshrd_query -n -l)" = "" ]; then
   _LOGTHIS INFO "Active User(s) detected: '0'"
@@ -83,6 +83,7 @@ sleep 5
 _LOGTHIS INFO "Backup Map files: ${_SAVEBKPDIR}/Enshrouded_Map-$(date +%d%m%Y-%H%M).zip"
 zip -q -r ${_SAVEBKPDIR}/Enshrouded-map_$(date +%d%m%Y-%H%M).zip  ${_GAMEDIR}/savegame/*
 # Update Core Game files only if steam game repo have been updated within last 24h (as this script is meant to run every day)
+_LOGTHIS INFO "Steam Core Game Repo last update: $_LASTGAMEUPDATE"
 if [ "$(date  -d "$_LASTGAMEUPDATE" +'%s')" -ge "$(date  +'%s' --date="-1 day")" ]; then
   _ENSHRDUPDATE
 else
@@ -105,5 +106,5 @@ while ! grep -q SVN ${_GAMEDIR}/logs/enshrouded_server.log; do
 	counter=$((counter+1))
 	[ "$counter" = 20 ] && _LOGTHIS END_FAIL "Service did not restart properly" && exit 1
 done
-_LOGTHIS END "Enshrouded Server [Version:$(grep SVN ${_GAMEDIR}/logs/enshrouded_server.log | awk '{print $NF}')] - Backup/Update Complete! "
+_LOGTHIS END_SUCCESS "Enshrouded Server [Version:$(grep SVN ${_GAMEDIR}/logs/enshrouded_server.log | awk '{print $NF}')] - Backup/Update Complete! "
 

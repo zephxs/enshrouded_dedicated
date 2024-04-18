@@ -53,16 +53,16 @@ if [ -x "${_INSTALLOC}/${_PROTONLATEST}/proton" ]; then
   if ${_INSTALLOC}/${_PROTONLATEST}/files/bin/wine64 --version >/dev/null 2>&1; then
     _LOGTHIS INFO "${_PROTONLATEST} Execution tests Validated! Installing.."
   else
-    _LOGTHIS INFO "${_PROTONLATEST} Execution tests Inconcistency [wine64], skip install.."
+    _LOGTHIS WARN "${_PROTONLATEST} Execution tests Inconcistency [wine64], skip install.."
     exit 1
   fi
 else
-  _LOGTHIS INFO "${_PROTONLATEST} Execution tests Inconcistency [proton], skip install.."
+  _LOGTHIS WARN "${_PROTONLATEST} Execution tests Inconcistency [proton], skip install.."
   exit 1
 fi
 cd $_INSTALLOC
 mv ${_PROTONLATEST}/user_settings.sample.py ${_PROTONLATEST}/user_settings.py
 unlink ${_INSTALLOC}/Proton-latest
 ln -s ${_INSTALLOC}/${_PROTONLATEST} ${_INSTALLOC}/Proton-latest
-_LOGTHIS INFO "${_PROTONLATEST} Install Complete!"
+_LOGTHIS SUCCESS "${_PROTONLATEST} Install Complete!"
 
