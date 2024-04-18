@@ -120,16 +120,15 @@ $cat ~/enshrd-monitor/update.log
 
 ### `proton-update` [Option within `enshrd_backupgrade`]
 - [x] Transparently Update Proton Installation if new latest version is availaible on Github "GloriousEggroll" Repository (cf. https://github.com/GloriousEggroll/proton-ge-custom/releases)
-- [x] Defined install directory: _\<Enshrouded User Homedir\>/.steam/root/compatibilitytools.d/Proton-latest_
-- [x] Automatic Symlink / test new install / and revert back in case of error
+- [x] Defined Proton install directory: _\<Enshrouded User Homedir\>/.steam/root/compatibilitytools.d/Proton-latest_
+- [x] Automatic Symlink / test new Proton and its embedded wine64 binaries before installing
 
 ```
 ls -lah $HOME/.steam/root/compatibilitytools.d/
-total 16K
-drwxrwxr-x  3 enshrouded enshrouded 4.0K Apr 16 13:28 .
-drwx------ 25 enshrouded enshrouded 4.0K Apr 12 21:42 ..
-drwxr-xr-x  5 enshrouded enshrouded 4.0K Apr 16 13:21 GE-Proton9-4
-lrwxrwxrwx  1 enshrouded enshrouded   62 Apr 16 13:02 Proton-latest -> /home/enshrouded/.steam/root/compatibilitytools.d/GE-Proton9-4
+
+drwxr-xr-x 4 zefadm zefadm 4.0K Apr 15 18:58 GE-Proton9-3
+drwxr-xr-x 4 zefadm zefadm 4.0K Apr 18 11:30 GE-Proton9-4
+lrwxrwxrwx 1 zefadm zefadm   58 Apr 18 11:30 Proton-latest -> /home/zefadm/.steam/root/compatibilitytools.d/GE-Proton9-4
 ```
 
 <br />
