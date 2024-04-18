@@ -59,9 +59,9 @@ else
   unlink ${_INSTALLOC}/Proton-latest
   ln -s ${_INSTALLOC}/${_PROTONCURVERSION} ${_INSTALLOC}/Proton-latest
   if [ -x "${_INSTALLOC}/Proton-latest/proton" ]; then
-  _LOGTHIS WARN "${_PROTONCURVERSION} has been reinstalled"
-  exit 0
-else
-  exit 1
+    _LOGTHIS WARN "${_PROTONCURVERSION} has been reinstalled"
+    exit 0
+  else
+    exit 1
+  fi
 fi
-
