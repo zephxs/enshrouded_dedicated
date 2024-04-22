@@ -62,7 +62,7 @@ else
 fi
 cd $_INSTALLOC
 mv ${_PROTONLATEST}/user_settings.sample.py ${_PROTONLATEST}/user_settings.py
-unlink ${_INSTALLOC}/Proton-latest
+[ -h "${_INSTALLOC}/Proton-latest" ] && unlink ${_INSTALLOC}/Proton-latest
 ln -s ${_INSTALLOC}/${_PROTONLATEST} ${_INSTALLOC}/Proton-latest
 _LOGTHIS SUCCESS "${_PROTONLATEST} Install Complete!"
 
