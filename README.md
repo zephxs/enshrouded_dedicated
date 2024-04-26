@@ -1,10 +1,14 @@
-# enshrouded_dedicated toolset
+# enshrouded_dedicated server toolset
 
 Simple Shell script-set to "Monitor / Backup / Update" Enshrouded dedicated servers.
 
+<br />
+
+## Overview
 
 Server-Side: 
-- `All the scripts` work together to collect realtime informations (every minutes), and once a day backup the server map and upgrade server core files if needed (with SteamCMD). 
+- `enshrd_steamuser_check` : collect server login/logout informations (every minutes), and convert steamID to Username.
+- `enshrd_backupgrade` + `enshrd_query` + `steamquery.py` : work together once a day to backup the server map and upgrade server core files if needed with SteamCMD (Optional: `proton-update` updates Proton-GE to latest version during the process). 
 - They all need to be placed in the PATH of the "enshrouded user" that runs the server binary (enshrouded_server.exe). 
 - The *"Enshourded User"* MUST have *"sudo"* properly configured for managing the Enshrouded Systemd Service during the Backup / Upgrade process (see "Sample Sudoer" at the end of this doc).
 
@@ -14,6 +18,8 @@ Client-Side:
 
 <br />
 <br />
+
+## Details
 
 ### `enshrd_query` + `steamquery.py`
 
@@ -118,7 +124,7 @@ $cat ~/enshrd-monitor/update.log
 <br />
 <br />
 
-### `proton-update` [Option within `enshrd_backupgrade`]
+### `proton-update` [Option in `enshrd_backupgrade`]
 - [x] Transparently Update Proton Installation if new latest version is availaible on Github "GloriousEggroll" Repository (cf. https://github.com/GloriousEggroll/proton-ge-custom/releases)
 - [x] Defined Proton install directory: _\<Enshrouded User Homedir\>/.steam/root/compatibilitytools.d/Proton-latest_
 - [x] Automatic Symlink / test new Proton and its embedded wine64 binaries before installing
