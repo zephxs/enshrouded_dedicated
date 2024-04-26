@@ -8,7 +8,7 @@ Simple Shell script-set to "Monitor / Backup / Update" Enshrouded dedicated serv
 
 Server-Side: 
 - `enshrd_steamuser_check` : collect server login/logout informations (every minutes), and convert steamID to Username.
-- `enshrd_backupgrade` + `enshrd_query` + `steamquery.py` : work together once a day to backup the server map and upgrade server core files if needed with SteamCMD (Optional: `proton-update` updates Proton-GE to latest version during the process). 
+- `enshrd_backupgrade` + `enshrd_query` + `steamquery.py` : work together once a day to backup the server map and upgrade server core files with SteamCMD if needed (Optional: `proton-update` updates Proton-GE to latest version during the process). 
 - They all need to be placed in the PATH of the "enshrouded user" that runs the server binary (enshrouded_server.exe). 
 - The *"Enshourded User"* MUST have *"sudo"* properly configured for managing the Enshrouded Systemd Service during the Backup / Upgrade process (see "Sample Sudoer" at the end of this doc).
 
