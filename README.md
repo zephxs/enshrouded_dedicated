@@ -142,6 +142,38 @@ lrwxrwxrwx 1 enshrouded enshrouded   58 Apr 18 11:30 Proton-latest -> /home/ensh
 <br />
 <br />
 
+### `enshrd-api`
+
+- [x] Flask API Endpoint : `enshrd_query` informations on port "8080" 
+- [x] "Password" will be the same as the Enshrouded Game Server (adapt enshrouded_server.json location in app.py)
+- [x] "User" does not matter (can be empty)
+
+> [!NOTE]
+> requires: `enshrd_query` and `2squery.py` in user PATH
+> Setup : Copy `enshrd-api` folder to Home Folder of the Enshrouded User
+> `cd $HOME/enshrd-api; python3 -m venv venv`
+> `python3 -m pip install python-a2s Flask Flask-HTTPAuth gunicorn`
+
+Sample Flask API Service using "Gunicorn" with 2 workers : _/etc/systemd/system/enshrd-api.service_
+```
+[Unit]
+Description=Gunicorn instance to serve enshrd_query
+After=network.target
+
+[Service]
+User=enshrouded
+WorkingDirectory=/home/enshrouded/enshrd-api
+Environment="PATH=/home/enshrouded/enshrd-api/venv/bin:/usr/bin:/usr/local/bin"
+ExecStart=/home/enshrouded/enshrd-api/venv/bin/gunicorn --workers 2 --bind 0.0.0.0:8080 app:app
+
+[Install]
+WantedBy=multi-user.target
+```
+
+<br />
+<br />
+
+
 ### Server Config for educational purpose : 
 
 <br />
