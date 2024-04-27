@@ -2,7 +2,8 @@
 # Get Enshrouded Server infos (via Valve ServerQueries) and Currently connected User list (via ssh)
 # Require 'python-a2s' library and 'ssh' access to the server
 #
-### v1.0 - FINAL greatly reduced script exectime by doing only one ssh call
+### v1.1 - Moved to 'python-a2s' library to get ping result and Game server Version (instead of log:SVN)
+### v1.0 - Greatly reduced script exectime by doing only one ssh call
 
 ### VARS (Important: has to match your install)
 # Server infos:
@@ -17,7 +18,7 @@ _TMPQUERYFILE="/tmp/.a2squery.log"
 _GAMEUSERDIR="/home/enshrouded"               # Enshrouded server User homedir
 _WKGDIR="${_GAMEUSERDIR}/enshrd-monitor"      # Enshrouded Server directory
 
-# Set _SERVERSIDE to "true" to run script on the server directly (or use '-l')
+# Set _SERVERSIDE to "true" to run script locally
 _SERVERSIDE=""                                # Set to true to avoid using '-l' locally (used for scripting purpose)
 
 
@@ -171,13 +172,15 @@ while read QUERYLINE; do
 	server_type)
           if [ "$_VALUE" = "'d'" ]; then _VALUE="Dedicated"
 	  elif [ "$_VALUE" = "'l'" ]; then _VALUE="Non-Dedicated"
-	  else _VALUE="SourceTV"
+	  elif [ "$_VALUE" = "'s'" ]; then _VALUE="SourceTV"
+	  else _VALUE="NotFound"
 	  fi
 	;;
 	platform)
           if [ "$_VALUE" = "'l'" ]; then _VALUE="Linux"
 	  elif [ "$_VALUE" = "'w'" ]; then _VALUE="Windows"
-	  else _VALUE="Mac"
+	  elif [ "$_VALUE" = "'m'" ]; then _VALUE="Mac"
+	  else _VALUE="NotFound"
 	  fi
 	;;
         ping)
