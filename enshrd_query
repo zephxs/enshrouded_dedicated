@@ -108,7 +108,7 @@ fi
 if [ -z "$_NUMCHECK" ]; then
   _BLU "################### Enshrouded Server Query ###################"
   _MYECHO "query type"
-  [ "$_SERVERSIDE" = "true" ] && echo "[local]" || echo -e "[${_GRX}remote${_REZ}]"
+  [ "$_SERVERSIDE" = "true" ] && echo -e "[${_GRX}local${_REZ}]" || echo -e "[${_GRX}remote${_REZ}]"
 fi
 # Auto set server to localhost if '-l'
 [ "$_SERVERSIDE" = "true" ] && _GAMESRV="localhost" || _GETSSHINFO=$(echo -e "Users: \c"; ssh -t $_SSHALIAS "cat ${_WKGDIR}/connected-users |tr '\n' ' '" 2>/dev/null &)
