@@ -9,7 +9,7 @@ Simple Shell script-set to "Monitor / Backup / Update" Enshrouded dedicated serv
 Server-Side: 
 - `enshrd_steamuser_check` : collect server login/logout informations (every minutes), and convert steamID to Username.
 - `enshrd_backupgrade` + `enshrd_query` + `a2squery.py` : work together once a day to backup the server map and upgrade server core files with SteamCMD if needed (Optional: `proton-update` updates Proton-GE to latest version during the process). 
-- `enshrd-api` : Simple password protected Flask API Endpoint for enshrd_query (port 8080)
+- `enshrd-api` : Flask API Endpoint for serving enshrd_query on port 8080 (password protected)
 - All the shell and python scripts need to be placed in the PATH of the "enshrouded user" that runs the server binary (enshrouded_server.exe). 
 - The *"Enshourded User"* MUST have *"sudo"* properly configured for managing the Enshrouded Systemd Service during the Backup / Upgrade process (see "Sample Sudoer" at the end of this document).
 
@@ -145,7 +145,7 @@ lrwxrwxrwx 1 enshrouded enshrouded   58 Apr 18 11:30 Proton-latest -> /home/ensh
 
 ### `enshrd-api`
 
-- [x] Flask API Endpoint : `enshrd_query` informations on port "8080" 
+- [x] Flask API Endpoint : serve `enshrd_query` informations on port "8080" 
 - [x] "Password" will be the same as the Enshrouded Game Server (adapt enshrouded_server.json location in app.py)
 - [x] "User" does not matter (can be empty)
 
@@ -155,7 +155,7 @@ lrwxrwxrwx 1 enshrouded enshrouded   58 Apr 18 11:30 Proton-latest -> /home/ensh
 > `cd $HOME/enshrd-api; python3 -m venv venv`
 > `python3 -m pip install python-a2s Flask Flask-HTTPAuth gunicorn`
 
-Sample Flask API Service using "Gunicorn" with 2 workers : _/etc/systemd/system/enshrd-api.service_
+Sample Flask Service using "Gunicorn" with 2 workers (port can be modified here) : _/etc/systemd/system/enshrd-api.service_
 ```
 [Unit]
 Description=Gunicorn instance to serve enshrd_query
