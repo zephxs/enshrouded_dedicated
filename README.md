@@ -43,6 +43,7 @@ Modes:
   -u|--user                              # Query currently connected user(s)
   -n|--number                            # Output only the number [0-9] of connected users (used locally for server restart/update)
   -l|--local                             # Used for server-side local run
+  -f|--full                              # Output all 'a2s' informations available
 ```
 
 
