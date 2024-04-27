@@ -180,6 +180,10 @@ while read QUERYLINE; do
 	  else _VALUE="Mac"
 	  fi
 	;;
+        ping)
+	  _MYECHO "$_NAME" && echo "$_VALUE" |awk '{printf "%.2f", $1*1000}' ; echo ms
+	  continue
+	;;
   esac
   _MYECHO "$_NAME" |tr '_' ' ' && echo "$_VALUE"
   if [ "$_NAME" = "player_count" ]; then
