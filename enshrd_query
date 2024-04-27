@@ -1,27 +1,20 @@
 #!/bin/bash
-# Get Enshrouded Server infos (via steamquery) and Currently connected User list + server version (via ssh)
-# Require 'pip' for getting steamquery library and 'ssh' access to the server
+# Get Enshrouded Server infos (via Valve ServerQueries) and Currently connected User list (via ssh)
+# Require 'python-a2s' library and 'ssh' access to the server
 #
 ### v1.0 - FINAL greatly reduced script exectime by doing only one ssh call
-### v0.6 - added serverside run (used for updateand backup server only if no user are connected)
-### v0.5 - added '-n' to only output the number of connected user : used for server update and restart
-### v0.4 - added user check and display from server connected-users list
-### v0.3 - added auto install prerequisites (only pip is needed in first place) and failed query / Online status
-### v0.2 - added args to bash an py, usage, and vars
-### v0.1 - POC
 
 ### VARS (Important: has to match your install)
 # Server infos:
-_GAMESRV="dedicated_enshrouded-server.net"    # Server hostname or IP address
+_GAMESRV="your.dedicated-server.net"          # Server hostname or IP address
 _QUERYPORT="15637"                            # Query port defined on your server
 _SSHALIAS="$_GAMESRV"                         # SSH server alias (set if different from server name)
 
 # tmp file location
-_TMPQUERYFILE="/tmp/.steamquery.log"
+_TMPQUERYFILE="/tmp/.a2squery.log"
 
 # Enshrouded Server location info
 _GAMEUSERDIR="/home/enshrouded"               # Enshrouded server User homedir
-_GAMEDIR="${_GAMEUSERDIR}/enshroudedserver"   # Enshrouded Server directory
 _WKGDIR="${_GAMEUSERDIR}/enshrd-monitor"      # Enshrouded Server directory
 
 # Set _SERVERSIDE to "true" to run script on the server directly (or use '-l')
@@ -29,41 +22,55 @@ _SERVERSIDE=""                                # Set to true to avoid using '-l' 
 
 
 # PREREQ
-# install SteamQuery python lib via pip (mantadory)
-type pip >/dev/null || { echo -e "Python 'pip' not found, and is required for SteamQuery library install\n  exiting.."; exit 1; }
-if ! pip show SteamQuery >/dev/null 2>&1; then pip install SteamQuery; fi
-# Load myecho for nicer output
-if ! type _MYECHO >/dev/null 2>&1; then
-  if [ -f "/etc/profile.d/01-myecho-colors.sh" ]; then
-    source /etc/profile.d/01-myecho-colors.sh >/dev/null 2>&1
-  elif [ -f "$HOME/01-myecho-colors.sh" ]; then
-    source "$HOME/01-myecho-colors.sh" >/dev/null 2>&1
-  else
-    echo "Nice Output - Install 'myecho' function (in homedir: 01-myecho-colors.sh)"
-    cd "$HOME"
-    curl -s -LO https://raw.githubusercontent.com/zephxs/bash/master/functions/01-myecho-colors.sh
-    head -20 01-myecho-colors.sh |grep -q "^_MYECHO () {" && echo "myecho installed!" || { echo "myecho install failed, exit.."; exit 1; }
-    source "$HOME/01-myecho-colors.sh" >/dev/null 2>&1
-  fi
-fi
+if ! pip show python-a2s >/dev/null 2>&1; then echo "# 'python-a2s' is NOT installed.. [pip install python-a2s]"; exit 1; fi
+
+# Colorize
+_REZ="\e[0m"
+_RDX="\e[1;31m"
+_BLX="\e[1;34m"
+_GRX="\e[1;32m"
+_MVX="\e[1;95m"
+_BLU () { echo -e "${_BLX}${@}${_REZ}" ; }
+_RED () { echo -e "${_RDX}${@}${_REZ}" ; }
+_GRN () { echo -e "${_GRX}${@}${_REZ}" ; }
+_MAV () { echo -e "${_MVX}${@}${_REZ}" ; }
+_OK () { echo -e "[${_GRX}OK${_REZ}${@}]" ; }
+_KO () { echo -e "[${_RDX}KO${_REZ}${@}]" ; }
+_OKn () { echo -e "[OK${@}]" ; }
+_KOn () { echo -e "[KO${@}]" ; }
+
+_MYECHO(){
+_DOTNUM=35
+if [ -z "$1" ]; then echo "<!> need argument"; return 1; fi
+_CHAINL=$(echo $@ | wc -c)
+_DOTL=$((_DOTNUM - _CHAINL))
+i=0
+echo -e "${_BLX}#${_REZ} $@\c"
+while [ "$i" -lt "$_DOTL" ]; do echo -e " \c"; i=$((i+1)); done
+echo -e "= \c"
+return 0
+}
+
 
 # Usage
 _SCRIPTUSAGE(){
-_MYECHO -c green -p "Server:"
+_GRN "Connection:"
 echo "  -s|--server <Ip-Hostname>"
 echo -e "  -p|--port   <query_port>\n"
-_MYECHO -p "  exemple: \"$(basename $0) <server>:<port>\""
-_MYECHO -p "  or: \"$(basename $0) -s <server> -p <port>\""
-echo -e "*** Server infos can be set in script variable to avoid input\n"
-_MYECHO -c green -p "Mode:"
+_BLU "  exemple: \"$(basename $0) <server>:<port>\""
+_BLU "  or: \"$(basename $0) -s <server> -p <port>\""
+echo -e "  *** Server infos can be set in script variable to avoid input\n"
+_GRN "Modes:"
 echo "  No Argument [default]"
-_MYECHO -p "  # Query All Steam Server Infos"
+_BLU "  # Query Steam Server Informations"
 echo -e "\n  -u|--user"
-_MYECHO -p "  # Query currently connected user(s)"
+_BLU "  # Query currently connected user(s)"
 echo -e "\n  -n|--number"
-_MYECHO -p "  # Output only the number [0-9] of connected users (used locally for server restart/update)"
+_BLU "  # Output only the number [0-9] of connected users (used locally for server restart/update)"
+echo -e "\n  -f|--full"
+_BLU "  # Output all 'a2s' informations available"
 echo -e "\n  -l|--local"
-_MYECHO -p "  # Used for server-side local run"
+_BLU "  # Used for server-side local run"
 }
 
 # Args parse
@@ -75,68 +82,62 @@ while (( "$#" )); do
   -u|--users) _USERCHECK="true"; shift 1;;
   -n|--number) _NUMCHECK="true"; shift 1;;
   -l|--local) _SERVERSIDE="true"; shift 1;;
+  -f|--full) _SHOWALL="true"; shift 1;;
   *) if grep -q ':' <<<$1; then
        _GAMESRV=$(awk -F':' '{print $1}' <<<$1)
        _QUERYPORT=$(awk -F':' '{print $NF}' <<<$1)
-     else _MYECHO -c red -p "Argument not 'game_server:port', exit.." && exit 1
+     else _RED "Argument not 'game_server:port', exit.." && exit 1
      fi
      shift 1
     ;;
-  -*|--*) _MYECHO -c red -p "Flag not recognised.." >&2; _SCRIPTUSAGE; exit 1 ;;
+  -*|--*) _RED "Flag not recognised.." >&2; _SCRIPTUSAGE; exit 1 ;;
   esac
 done
 
+# test gameserver and port variables
+[ -z "$_GAMESRV" -a -z "$_QUERYPORT" ] && _RED "Missing Server:Port args.. exit" && exit 1
 # Title
 if [ -z "$_NUMCHECK" ]; then
-  _MYECHO -t "Enshrouded Server Query"
+  _BLU "################### Enshrouded Server Query ###################"
   _MYECHO "query type"
-  [ "$_SERVERSIDE" = "true" ] && echo "[local]" || echo "[remote]"
+  [ "$_SERVERSIDE" = "true" ] && echo "[local]" || echo -e "[${_GRX}remote${_REZ}]"
 fi
 # Auto set server to localhost if '-l'
-[ "$_SERVERSIDE" = "true" ] && _GAMESRV="localhost" ||  _GETSSHINFO=$(ssh -t $_SSHALIAS "awk '/SVN/ {print \$NF}' ${_GAMEDIR}/logs/enshrouded_server.log; echo -e '#\c'; cat ${_WKGDIR}/connected-users |tr '\n' ' '" 2>/dev/null &)
+[ "$_SERVERSIDE" = "true" ] && _GAMESRV="localhost" || _GETSSHINFO=$(echo -e "Users: \c"; ssh -t $_SSHALIAS "cat ${_WKGDIR}/connected-users |tr '\n' ' '" 2>/dev/null &)
 
-
-### MAIN
-# Get connected user and server version
+# Get connected user
 if [ -z "$_NUMCHECK" ]; then
   if [ "$_SERVERSIDE" = "true" ]; then
     _MYECHO "local files"
-    if [ -f "${_WKGDIR}/connected-users" ] && [ -f "${_GAMEDIR}/logs/enshrouded_server.log" ]; then
-      _GETACTIVEUSERS=$(cat ${_WKGDIR}/connected-users |tr "\n" " ")
-      _CURRENTVERSION=$(awk '/SVN/ {print $NF}' ${_GAMEDIR}/logs/enshrouded_server.log)
-      _OK
-    else
-      _GETACTIVEUSERS="not found"
-      _CURRENTVERSION="not found"
-      _KO
-    fi
+    [ -f "${_WKGDIR}/connected-users" ] && { _GETACTIVEUSERS=$(cat ${_WKGDIR}/connected-users |tr "\n" " "); _OKn; } || { _GETACTIVEUSERS="not found"; _KOn; }
   else
     _MYECHO "ssh infos"
-    if [ ! -z "$_GETSSHINFO" ]; then
-      _GETACTIVEUSERS=$(echo $_GETSSHINFO| tr "\n" " " |awk -F'#' '{print $NF}')
-      _CURRENTVERSION=$(echo $_GETSSHINFO| tr "\n" " " |awk -F'#' '{print $1}')
-      _OK
-    else
-      _GETACTIVEUSERS="not found"
-      _CURRENTVERSION="not found"
-      _KO
-    fi
+    [ ! -z "$_GETSSHINFO" ] && { _GETACTIVEUSERS=$(awk -F': ' '{print $NF}' <<<$_GETSSHINFO); _OK; } || { _GETACTIVEUSERS="not found"; _KO; }
   fi
 fi
 
-# test gameserver and port variables
-[ -z "$_GAMESRV" -a -z "$_QUERYPORT" ] && _MYECHO -c red -p "Missing Server:Port args.. exit" && exit 1
 
-# Get server status with python SteamQuery lib
+# Get server status with python-a2s lib
 [ "$_NUMCHECK" = "true" ] || _MYECHO "online state"
-steamquery.py $_GAMESRV $_QUERYPORT |tr -d "{|}|'" |tr "," "\n" >${_TMPQUERYFILE}
-grep -q "^error:" ${_TMPQUERYFILE} && { [ "$_NUMCHECK" = "true" ] || _KO; exit 1; } || [ "$_NUMCHECK" = "true" ] || _OK
+a2squery.py $_GAMESRV $_QUERYPORT |tr ",|(|)" "\n" |grep -v '^$' >${_TMPQUERYFILE}
+# stop if error found
+if ! grep -q "^error:" ${_TMPQUERYFILE} && [ -s "${_TMPQUERYFILE}" ]; then
+  [ "$_NUMCHECK" = "true" ] || { [ "$_SERVERSIDE" = "true" ] && _OKn || _OK; }
+else
+  [ "$_NUMCHECK" = "true" ] || { [ "$_SERVERSIDE" = "true" ] && _OKn || _OK; }
+  exit 1
+fi
 
-[ "$_NUMCHECK" = "true" ] && grep "^ players" ${_TMPQUERYFILE} |awk -F': ' '{print $NF}' && exit 0 
+# parse server version from "keywords"
+_CURRENTVERSION=$(awk -F';' '/keywords/ {print $NF}' ${_TMPQUERYFILE} |tr -d "'")
+
+# Number only check
+[ "$_NUMCHECK" = "true" ] && awk -F'=' '/player_count/ {print $NF}' ${_TMPQUERYFILE} && exit 0 
+
 # Users only check
 if [ "$_USERCHECK" = "true" ]; then
-_SRVNAME=$(cat ${_TMPQUERYFILE} |awk -F': ' '/name/ {print $NF}')
-_USERS=$(grep "^ players" ${_TMPQUERYFILE} |awk -F': ' '{print $NF}')
+_SRVNAME=$(awk -F'=' '/server_name/ {print $NF}' ${_TMPQUERYFILE})
+_USERS=$(awk -F'=' '/player_count/ {print $NF}' ${_TMPQUERYFILE})
 _MYECHO "server name" && echo "$_SRVNAME"
 _MYECHO "server version" && echo "$_CURRENTVERSION"
 _MYECHO "connected users" && echo "$_USERS"
@@ -148,15 +149,33 @@ fi
 exit 0
 fi
 
-# Parse all Server Infos
+# Parse all Server Infos and do not display those in _UNUSED
+[ "$_SHOWALL" = true ] && _UNUSED=() || _UNUSED=(SourceInfo map_name steam_id folder app_id version edf stv_port stv_name keywords)
 while read QUERYLINE; do
-  _NAME=$(awk -F': |:' '{print $1}' <<<$QUERYLINE)
-  _VALUE=$(awk -F': ' '{print $2}' <<<$QUERYLINE)
-  [ -z "$_VALUE" ] && _VALUE="default"
-  [ $_NAME = online ] && continue 
+  _NAME=$(awk -F'=' '{print $1}' <<<$QUERYLINE)
+  _VALUE=$(awk -F'=' '{print $2}' <<<$QUERYLINE)
+  # remove unused
+  grep -q $_NAME <<<${_UNUSED[@]} && continue 
+  # set blanck value to 'default'
+  [ -z "$_VALUE" -o "$_VALUE" = "''" ] && _VALUE="default"
+  # parse server_type and platform to show full value
+  case "$_NAME" in
+	server_type)
+          if [ "$_VALUE" = "'d'" ]; then _VALUE="Dedicated"
+	  elif [ "$_VALUE" = "'l'" ]; then _VALUE="Non-Dedicated"
+	  else _VALUE="SourceTV"
+	  fi
+	;;
+	platform)
+          if [ "$_VALUE" = "'l'" ]; then _VALUE="Linux"
+	  elif [ "$_VALUE" = "'w'" ]; then _VALUE="Windows"
+	  else _VALUE="Mac"
+	  fi
+	;;
+  esac
   _MYECHO "$_NAME" |tr '_' ' ' && echo "$_VALUE"
-  if [ $_NAME = players ]; then
-    [ $_VALUE -gt 0 ] && _SHOWPLAYERS="true"
+  if [ "$_NAME" = "player_count" ]; then
+    [ "$_VALUE" -gt 0 ] && _SHOWPLAYERS="true"
   fi
 done <${_TMPQUERYFILE}
 _MYECHO "server version" && echo "$_CURRENTVERSION"

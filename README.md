@@ -8,22 +8,22 @@ Simple Shell script-set to "Monitor / Backup / Update" Enshrouded dedicated serv
 
 Server-Side: 
 - `enshrd_steamuser_check` : collect server login/logout informations (every minutes), and convert steamID to Username.
-- `enshrd_backupgrade` + `enshrd_query` + `steamquery.py` : work together once a day to backup the server map and upgrade server core files with SteamCMD if needed (Optional: `proton-update` updates Proton-GE to latest version during the process). 
+- `enshrd_backupgrade` + `enshrd_query` + `a2squery.py` : work together once a day to backup the server map and upgrade server core files with SteamCMD if needed (Optional: `proton-update` updates Proton-GE to latest version during the process). 
 - They all need to be placed in the PATH of the "enshrouded user" that runs the server binary (enshrouded_server.exe). 
 - The *"Enshourded User"* MUST have *"sudo"* properly configured for managing the Enshrouded Systemd Service during the Backup / Upgrade process (see "Sample Sudoer" at the end of this doc).
 
 
 Client-Side: 
-- `enshrd_query` + `steamquery.py` scripts are used to get Enshrouded Server status, base informations, Enshrouded SVN Server version, and Steam Username(s) that are currently logged in to the server.
+- `enshrd_query` + `a2squery.py` scripts are used to get Enshrouded Server status, base informations, Enshrouded SVN Server version, and Steam Username(s) that are currently logged in to the server.
 
 <br />
 <br />
 
 ## Details
 
-### `enshrd_query` + `steamquery.py`
+### `enshrd_query` + `a2squery.py`
 
-- [x] Show Server_Query informations: `steamquery.py <server> <port>` can be used separately without any private access to the server (cf. https://developer.valvesoftware.com/wiki/Server_Queries)
+- [x] Show Server_Query informations: `a2squery.py <server> <port>` can be used separately without any private access to the server (cf. https://developer.valvesoftware.com/wiki/Server_Queries)
 - [x] Display Currently connected Steam Usernames
 - [x] Display Enshrouded Server Version
 
@@ -48,6 +48,7 @@ Modes:
 
 > [!NOTE]
 > requires: python3 `pip` for SteamQuery lib install and use, `ssh access` to the server (preferably with a running agent), 
+> `python3 -m pip install python-a2s`
 
 <br />
 
