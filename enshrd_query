@@ -36,8 +36,6 @@ _GRN () { echo -e "${_GRX}${@}${_REZ}" ; }
 _MAV () { echo -e "${_MVX}${@}${_REZ}" ; }
 _OK () { echo -e "[${_GRX}OK${_REZ}${@}]" ; }
 _KO () { echo -e "[${_RDX}KO${_REZ}${@}]" ; }
-_OKn () { echo -e "[OK${@}]" ; }
-_KOn () { echo -e "[KO${@}]" ; }
 
 _MYECHO(){
 _DOTNUM=35
@@ -83,6 +81,7 @@ while (( "$#" )); do
   -n|--number) _NUMCHECK="true"; shift 1;;
   -l|--local) _SERVERSIDE="true"; shift 1;;
   -f|--full) _SHOWALL="true"; shift 1;;
+  -c|--colorfree) _SHOWCOLOR="false"; shift 1;;
   *) if grep -q ':' <<<$1; then
        _GAMESRV=$(awk -F':' '{print $1}' <<<$1)
        _QUERYPORT=$(awk -F':' '{print $NF}' <<<$1)
@@ -93,6 +92,15 @@ while (( "$#" )); do
   -*|--*) _RED "Flag not recognised.." >&2; _SCRIPTUSAGE; exit 1 ;;
   esac
 done
+
+
+if [ "$_SHOWCOLOR" = "false" ]; then
+_REZ=""
+_RDX=""
+_BLX=""
+_GRX=""
+_MVX=""
+fi
 
 # test gameserver and port variables
 [ -z "$_GAMESRV" -a -z "$_QUERYPORT" ] && _RED "Missing Server:Port args.. exit" && exit 1
@@ -109,7 +117,7 @@ fi
 if [ -z "$_NUMCHECK" ]; then
   if [ "$_SERVERSIDE" = "true" ]; then
     _MYECHO "local files"
-    [ -f "${_WKGDIR}/connected-users" ] && { _GETACTIVEUSERS=$(cat ${_WKGDIR}/connected-users |tr "\n" " "); _OKn; } || { _GETACTIVEUSERS="not found"; _KOn; }
+    [ -f "${_WKGDIR}/connected-users" ] && { _GETACTIVEUSERS=$(cat ${_WKGDIR}/connected-users |tr "\n" " "); _OK; } || { _GETACTIVEUSERS="not found"; _KO; }
   else
     _MYECHO "ssh infos"
     [ ! -z "$_GETSSHINFO" ] && { _GETACTIVEUSERS=$(awk -F': ' '{print $NF}' <<<$_GETSSHINFO); _OK; } || { _GETACTIVEUSERS="not found"; _KO; }
@@ -122,9 +130,9 @@ fi
 a2squery.py $_GAMESRV $_QUERYPORT |tr ",|(|)" "\n" |grep -v '^$' >${_TMPQUERYFILE}
 # stop if error found
 if ! grep -q "^error:" ${_TMPQUERYFILE} && [ -s "${_TMPQUERYFILE}" ]; then
-  [ "$_NUMCHECK" = "true" ] || { [ "$_SERVERSIDE" = "true" ] && _OKn || _OK; }
+  [ "$_NUMCHECK" = "true" ] || _OK
 else
-  [ "$_NUMCHECK" = "true" ] || { [ "$_SERVERSIDE" = "true" ] && _OKn || _OK; }
+  [ "$_NUMCHECK" = "true" ] || _KO
   exit 1
 fi
 
