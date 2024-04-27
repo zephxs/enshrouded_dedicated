@@ -5,7 +5,6 @@ from flask_httpauth import HTTPBasicAuth
 app = Flask(__name__)
 # Provide proper enshrouded_server.json location"
 json_conf = '/home/enshrouded/enshroudedserver/enshrouded_server.json'
-app.secret_key = '5Z1uFfQ6TvsdgHVfnNuogTi9n14xCk9yIeM3FSWdEU9UAivznk63'
 auth = HTTPBasicAuth()
 
 with open(json_conf, 'r') as jsonfile: 
