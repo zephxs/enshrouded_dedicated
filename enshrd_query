@@ -188,7 +188,7 @@ while read QUERYLINE; do
 	  continue
 	;;
   esac
-  _MYECHO "$_NAME" |tr '_' ' ' && echo "$_VALUE"
+  _MYECHO "$_NAME" |tr "_" " " && echo "$_VALUE" |tr -d "'"
   if [ "$_NAME" = "player_count" ]; then
     [ "$_VALUE" -gt 0 ] && _SHOWPLAYERS="true"
   fi
