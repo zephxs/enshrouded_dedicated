@@ -116,20 +116,21 @@ if grep '\[online\] Client' ${_WKGDIR}/log_news | grep -q 'authenticated by stea
       _LOGTHIS INFO "User Connected = $_STEAMUSER $_NEWHANDLER"
       [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "Enshrouded Server
 # User Connected = $_STEAMUSER"
-      grep -q "$_STEAMUSER" $_CONNECTED_USERS || echo "$_STEAMUSER" >>$_CONNECTED_USERS 
+      grep -q "$_STEAMUSER" $_CONNECTED_USERS || echo "$_STEAMUSER $_NEWHANDLER" >>$_CONNECTED_USERS 
     fi
   done
 fi
 
 # Now try to find removed player
-if grep -q 'Remove Entity for Player' ${_WKGDIR}/log_news; then
-  _REMOVEDPLAYER=($(awk '/Remove Entity for Player/ {print $NF}' ${_WKGDIR}/log_news |tr -d "'"))
-  for _REMOVEDUSER in ${_REMOVEDPLAYER[@]}; do
-    _LOGTHIS INFO "User Logout = $_REMOVEDPLAYER"
+if grep -q ' Remove player from session. Not found in online game info. Player Handle' ${_WKGDIR}/log_news; then
+  _REMOVEDHANDLES=($(awk '/ Player removed. Player handle/ {print $NF}' ${_WKGDIR}/log_news |tr -d "'"))
+  for _REMOVEDHANDLE in ${_REMOVEDHANDLES[@]}; do
+    _REMOVEDUSER=$(grep "$_REMOVEDHANDLE" ${_CONNECTED_USERS} |awk '{print $1}')
+    _LOGTHIS INFO "User Logout = $_REMOVEDUSER"
   grep -q "$_REMOVEDUSER" $_CONNECTED_USERS && sed -i "/$_REMOVEDUSER/d" $_CONNECTED_USERS
-  done
   [ "$_TELEGRAM_ALERT" = true ] && telegram-send -c alarm "Enshrouded Server
-# User Logout = ${_REMOVEDPLAYER[@]}"
+# User Logout = ${_REMOVEDUSER}"
+  done
 fi
 
 ### POST
