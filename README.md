@@ -111,17 +111,21 @@ $cat ~/enshrd-monitor/user-connection.log
 _Sample logs:_
 ```
 $cat ~/enshrd-monitor/update.log
-[2024-04-17 13:25:07] [START] Enshrouded server Backup / Update started
-[2024-04-17 13:25:07] [INFO] Current version: 511168
-[2024-04-17 13:25:07] [INFO] Steam Game Repo last update: Wed Apr 17 08:26:12 UTC 2024
-[2024-04-17 13:25:08] [INFO] Active User(s) detected: '0'
-[2024-04-17 13:25:08] [INFO] Stopping service: enshrd.service
-[2024-04-17 13:26:43] [INFO] Backup Map files: /home/enshrouded/enshrd-bak/Enshrouded_Map-17042024-1326.zip
-[2024-04-17 13:26:44] [INFO] SteamCMD Update Starting
-[2024-04-17 13:27:41] [INFO] SteamCMD Update Finished!
-[2024-04-17 13:27:41] [INFO] Proton Repo Check: Update not needed
-[2024-04-17 13:27:41] [INFO] Restarting service: enshrd.service
-[2024-04-17 13:28:06] [END] Enshrouded Server [Version:516139] - Backup/Update Complete!
+[2024-06-07 04:05:33] [START] Enshrouded server Backup / Update started
+[2024-06-07 04:05:33] [INFO] Current version: 532860
+[2024-06-07 04:05:34] [INFO] Active User(s) detected: '0'
+[2024-06-07 04:05:34] [INFO] Stopping service: enshrd.service
+[2024-06-07 04:07:09] [INFO] Backup Map files: /home/enshrouded/enshrd-bak/Enshrouded_Map-07062024-0407.zip
+[2024-06-07 04:07:10] [INFO] Steam Core Game Repo last update: Thu Jun  6 11:17:37 UTC 2024
+[2024-06-07 04:07:10] [INFO] Starting SteamCMD Game Update
+[2024-06-07 04:07:10] [INFO] SteamCMD Log: /home/enshrouded/enshrd-monitor/steamcmd-last-update.log
+[2024-06-07 04:08:52] [SUCCESS] SteamCMD Update Success!
+[2024-06-07 04:08:53] [INFO] Proton Current Version: GE-Proton9-6
+[2024-06-07 04:08:53] [INFO] Upgrading to Proton Latest: GE-Proton9-7
+[2024-06-07 04:09:02] [INFO] GE-Proton9-7 Execution tests Validated! Installing..
+[2024-06-07 04:09:02] [SUCCESS] GE-Proton9-7 Install Complete!
+[2024-06-07 04:09:02] [INFO] Restarting service: enshrd.service
+[2024-06-07 04:10:08] [END_SUCCESS] Enshrouded Server [Version:533348] - Backup/Update Complete!
 ```
 
 <br />
