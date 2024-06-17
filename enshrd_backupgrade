@@ -104,7 +104,7 @@ counter="0"
 while ! grep -q SVN ${_GAMEDIR}/logs/enshrouded_server.log; do
 	sleep 3
 	counter=$((counter+1))
-	[ "$counter" = 20 ] && _LOGTHIS END_FAIL "Service did not restart properly" && exit 1
+	[ "$counter" = 40 ] && _LOGTHIS END_FAIL "Service did not restart properly" && exit 1
 done
 _LOGTHIS END_SUCCESS "Enshrouded Server [Version:$(grep SVN ${_GAMEDIR}/logs/enshrouded_server.log | awk '{print $NF}')] - Backup/Update Complete! "
 
