@@ -2,6 +2,7 @@
 # prereq: pip install python-a2s
 import sys, a2s
 
+sys.tracebacklimit = 0
 if sys.argv[-1] in ("--help", "-h"):
     print("Usage: python3 a2squery.py <server_IP/FQDN> <query_port>")
 elif len(sys.argv) <= 2:
