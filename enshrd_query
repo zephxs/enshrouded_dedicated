@@ -138,7 +138,7 @@ else
 fi
 
 # parse server version from "keywords"
-_CURRENTVERSION=$(awk -F';' '/keywords/ {print $NF}' ${_TMPQUERYFILE} |tr -d "'")
+_CURRENTVERSION=$(awk -F';' '/keywords/ {print $(NF-2)}' ${_TMPQUERYFILE} |tr -d "'")
 
 # Number only check
 [ "$_NUMCHECK" = "true" ] && awk -F'=' '/player_count/ {print $NF}' ${_TMPQUERYFILE} && exit 0 
