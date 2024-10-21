@@ -55,8 +55,30 @@ _LOGTHIS SUCCESS "SteamCMD Update Success!" || \
 _LOGTHIS FAIL "SteamCMD Update Failed.."
 }
 
-# Base Informations collect
-_LASTGAMEUPDATE=$(date -d @$(curl -s https://api.steamcmd.net/v1/info/2278520 | jq '.data."2278520".depots.branches.public.timeupdated' |tr -d '"'))
+### Base Informations collect
+#_LASTGAMEUPDATE=$(date -d @$(curl -s https://api.steamcmd.net/v1/info/2278520 | jq '.data."2278520".depots.branches.public.timeupdated' |tr -d '"'))
+# loop to get SteamCMD last update date
+_MAX_RETRIES=5
+_RETRY_INTERVAL=5  # seconds
+attempt=0
+while [ $attempt -lt $_MAX_RETRIES ]; do
+  response=$(curl -s https://api.steamcmd.net/v1/info/2278520)
+  if [ $? = 0 ]; then
+    timeupdated=$(echo "$response" | jq '.data."2278520".depots.branches.public.timeupdated' | tr -d '"')
+    if [ -n "$timeupdated" ]; then
+      _LASTGAMEUPDATE=$(date -d @$timeupdated)
+      break
+    fi
+  fi
+  attempt=$(($attempt+1))
+  sleep $_RETRY_INTERVAL
+done
+if [ $attempt -eq $_MAX_RETRIES ]; then
+  _LASTGAMEUPDATE=$(date  +'%s' --date="-1 week")
+fi
+
+
+
 _CURRENTVERSION=$(grep SVN ${_GAMEDIR}/logs/enshrouded_server.log | awk '{print $NF}')
 
 # Main
