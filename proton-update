@@ -45,7 +45,7 @@ fi
 ### MAIN
 [ -d "$_TMPDLFOLDER" ] || mkdir $_TMPDLFOLDER
 cd $_TMPDLFOLDER
-curl -sLOJ "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/${_PROTONLATEST}/${_PROTONLATEST}.tar.gz" 
+curl -sLOJ --connect-timeout 10 "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/${_PROTONLATEST}/${_PROTONLATEST}.tar.gz" || { _LOGTHIS WARN "${_PROTONLATEST} Github download failed, skip install.."; exit 1; }
 tar -xzf GE-Proton*.tar.gz -C ${_INSTALLOC}/
 rm -rf ${_TMPDLFOLDER}/*
 # Test if new proton bin is executable and if embedded wine64 works correctly
