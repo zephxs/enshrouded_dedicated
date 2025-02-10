@@ -193,7 +193,7 @@ while read QUERYLINE; do
     [ "$_VALUE" -gt 0 ] && _SHOWPLAYERS="true"
   fi
 done <${_TMPQUERYFILE}
-_MYECHO "server version" && echo "$_CURRENTVERSION"
+_MYECHO "server build" && echo "$_CURRENTVERSION"
 [ "$_SHOWPLAYERS" = true ] && { _MYECHO "username(s)"; echo "$_GETACTIVEUSERS"; }
 echo
 
