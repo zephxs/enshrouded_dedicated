@@ -138,7 +138,7 @@ else
 fi
 
 # parse server version from "keywords"
-_CURRENTVERSION=$(awk -F';' '/keywords/ {print $(NF-2)}' ${_TMPQUERYFILE} |tr -d "'")
+_CURRENTVERSION=$(awk -F';' '/keywords/ {print $2}' ${_TMPQUERYFILE} |tr -d "'")
 
 # Number only check
 [ "$_NUMCHECK" = "true" ] && awk -F'=' '/player_count/ {print $NF}' ${_TMPQUERYFILE} && exit 0 
@@ -148,7 +148,7 @@ if [ "$_USERCHECK" = "true" ]; then
 _SRVNAME=$(awk -F'=' '/server_name/ {print $NF}' ${_TMPQUERYFILE})
 _USERS=$(awk -F'=' '/player_count/ {print $NF}' ${_TMPQUERYFILE})
 _MYECHO "server name" && echo "$_SRVNAME"
-_MYECHO "server version" && echo "$_CURRENTVERSION"
+_MYECHO "server build" && echo "$_CURRENTVERSION"
 _MYECHO "connected users" && echo "$_USERS"
 if [ "$_USERS" -gt 0 ]; then
   _MYECHO "username(s)"
